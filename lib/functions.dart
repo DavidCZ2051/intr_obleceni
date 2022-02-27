@@ -1,4 +1,5 @@
-import 'package:flutter/material.dart';
+/* import 'package:flutter/material.dart';
+import 'package:intr_obleceni/main.dart';
 
 category(categoryName, color) {
   return Container(
@@ -27,7 +28,7 @@ category(categoryName, color) {
   );
 }
 
-item(itemName, color, itemVariable) {
+item(itemName, color, itemVariable, {Function? callback}) {
   return Container(
     color: color ? Colors.grey[200] : Colors.white,
     child: Row(
@@ -52,7 +53,7 @@ item(itemName, color, itemVariable) {
               onSubmitted: (value) {
                 itemVariable = int.parse(value);
                 print("Hodnota pro $itemName nastavena na: $itemVariable");
-                //setState(() {});
+                callback(); //setState(() {});
               },
               keyboardType: TextInputType.number,
               decoration: InputDecoration(
@@ -73,3 +74,4 @@ item(itemName, color, itemVariable) {
     ),
   );
 }
+ */

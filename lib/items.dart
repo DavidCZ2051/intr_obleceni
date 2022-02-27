@@ -1,6 +1,6 @@
 class Bundy {
   static int bunda = 0;
-  static int softcilovaBunda = 0;
+  static int softshellovaBunda = 0;
 }
 
 class Ostatni {
