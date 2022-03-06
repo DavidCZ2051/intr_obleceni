@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:intr_obleceni/items.dart';
-//import 'package:intr_obleceni/functions.dart';
 import 'package:intr_obleceni/settings.dart';
 
 void main() => runApp(
@@ -19,6 +18,10 @@ class Main extends StatefulWidget {
 
 class _MainState extends State<Main> {
   @override
+  void callback() {
+    setState(() {});
+  }
+
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
@@ -70,7 +73,7 @@ class _MainState extends State<Main> {
 
 //functions
 
-item(itemName, color, itemVariable, {Function? callback}) {
+item(itemName, color, itemVariable, {Function? callstate}) {
   return Container(
     color: color ? Colors.grey[200] : Colors.white,
     child: Row(
@@ -95,7 +98,7 @@ item(itemName, color, itemVariable, {Function? callback}) {
               onSubmitted: (value) {
                 itemVariable = int.parse(value);
                 print("Hodnota pro $itemName nastavena na: $itemVariable");
-                callback!();
+                callback();
               },
               keyboardType: TextInputType.number,
               decoration: InputDecoration(
