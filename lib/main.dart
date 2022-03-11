@@ -18,10 +18,6 @@ class Main extends StatefulWidget {
 
 class _MainState extends State<Main> {
   @override
-  void callback() {
-    setState(() {});
-  }
-
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
@@ -98,7 +94,6 @@ item(itemName, color, itemVariable, {Function? callstate}) {
               onSubmitted: (value) {
                 itemVariable = int.parse(value);
                 print("Hodnota pro $itemName nastavena na: $itemVariable");
-                callback();
               },
               keyboardType: TextInputType.number,
               decoration: InputDecoration(
