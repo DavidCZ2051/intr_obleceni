@@ -20,6 +20,7 @@ class _SettingsState extends State<Settings> {
           title: const Text("Nastavení"),
           actions: [
             IconButton(
+              tooltip: "Smazat data",
               icon: const Icon(Icons.delete),
               onPressed: () {
                 showDialog(
@@ -65,6 +66,7 @@ class _SettingsState extends State<Settings> {
                         decoration: InputDecoration(
                           hintText: "Zadejte položku",
                           suffixIcon: IconButton(
+                            tooltip: "Přidat položku",
                             icon: const Icon(Icons.send),
                             onPressed: () {
                               if (vars.addedClothing != null) {
@@ -92,6 +94,7 @@ class _SettingsState extends State<Settings> {
                   child: Row(
                     children: <Widget>[
                       IconButton(
+                        tooltip: "Odebrat položku",
                         onPressed: () {
                           setState(() {
                             vars.clothesSettings.remove(item);

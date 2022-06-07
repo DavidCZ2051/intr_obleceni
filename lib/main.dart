@@ -54,6 +54,7 @@ class _MainState extends State<Main> {
           title: const Text("Internát - seznam oblečení"),
           actions: [
             IconButton(
+              tooltip: "Nastavení",
               icon: const Icon(Icons.settings),
               onPressed: () {
                 Navigator.push(
