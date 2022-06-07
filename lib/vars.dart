@@ -1,8 +1,13 @@
 String? addedClothing;
-List<String> clothesSettings = [];
-List clothes = [];
+List<Clothing> clothes = [];
 
 class Clothing {
   String? name;
   int? count;
+  Map toJson() {
+    return {
+      "name": name,
+      "count": count,
+    };
+  }
 }

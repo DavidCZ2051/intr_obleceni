@@ -18,30 +18,17 @@ class Main extends StatefulWidget {
   _MainState createState() => _MainState();
 }
 
-loadSettingsData() async {
-  print("loading settings data");
-  final SharedPreferences prefs = await SharedPreferences.getInstance();
-  vars.clothesSettings = prefs.getStringList("clothes-settings") ?? [];
-  print("settings data loaded");
-}
-
 loadData() async {
-  print("loading data:");
-  for (String item in vars.clothesSettings) {
-    print(item);
-    vars.clothes.add(vars.Clothing()
-      ..name = item
-      ..count = 0);
-  }
-  print("data loaded:");
-  print(vars.clothes);
+  print("loading  data");
+  final SharedPreferences prefs = await SharedPreferences.getInstance();
+  //vars.clothes = prefs.getStringList("clothes") ?? [];
+  print("data loaded");
 }
 
 class _MainState extends State<Main> {
   @override
   void didChangeDependencies() async {
     super.didChangeDependencies();
-    await loadSettingsData();
     await loadData();
     setState(() {});
   }
