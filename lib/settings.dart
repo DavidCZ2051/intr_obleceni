@@ -37,7 +37,7 @@ class _SettingsState extends State<Settings> {
                         child: const Text("Smazat"),
                         onPressed: () {
                           vars.clothes.clear();
-                          update();
+                          saveData();
                           Navigator.pop(context);
                           setState(() {});
                         },
@@ -69,12 +69,15 @@ class _SettingsState extends State<Settings> {
                             icon: const Icon(Icons.send),
                             onPressed: () {
                               if (vars.addedClothing != null) {
-                                vars.clothes.add(vars.Clothing()
-                                  ..name = vars.addedClothing
-                                  ..count = 0);
+                                vars.clothes.add(
+                                  vars.Clothing(
+                                    name: vars.addedClothing,
+                                    count: 0,
+                                  ),
+                                );
                                 vars.addedClothing = null;
                                 print(vars.clothes);
-                                update();
+                                saveData();
                                 _controller.clear();
                                 setState(() {});
                               }
@@ -97,11 +100,10 @@ class _SettingsState extends State<Settings> {
                       IconButton(
                         tooltip: "Odebrat položku",
                         onPressed: () {
-                          setState(() {
-                            vars.clothes.remove(clothing);
-                            update();
-                            print(vars.clothes);
-                          });
+                          vars.clothes.remove(clothing);
+                          saveData();
+                          print(vars.clothes);
+                          setState(() {});
                         },
                         icon: const Icon(Icons.close),
                       ),
@@ -120,7 +122,7 @@ class _SettingsState extends State<Settings> {
   }
 }
 
-update() {
+saveData() {
   List<String> list = [];
   for (vars.Clothing clothing in vars.clothes) {
     list.add(clothing.toJson().toString());

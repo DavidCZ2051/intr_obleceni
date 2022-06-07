@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:intr_obleceni/settings.dart';
+import 'dart:convert';
 import 'package:intr_obleceni/vars.dart' as vars;
 
 void main() => runApp(
@@ -19,10 +20,27 @@ class Main extends StatefulWidget {
 }
 
 loadData() async {
+  List<String> list = [];
   print("loading  data");
   final SharedPreferences prefs = await SharedPreferences.getInstance();
-  //vars.clothes = prefs.getStringList("clothes") ?? [];
+  list = prefs.getStringList("clothes") ?? [];
+  for (String item in list) {
+    // convert json to object
+    vars.clothes.add(vars.Clothing.fromJson(jsonDecode(item)));
+  }
   print("data loaded");
+}
+
+saveData() {
+  List<String> list = [];
+  for (vars.Clothing clothing in vars.clothes) {
+    list.add(clothing.toJson().toString());
+  }
+  print(list);
+  SharedPreferences.getInstance().then((prefs) {
+    prefs.setStringList("clothes", list);
+    print("saved");
+  });
 }
 
 class _MainState extends State<Main> {
@@ -47,7 +65,7 @@ class _MainState extends State<Main> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(builder: (context) => const Settings()),
-                );
+                ).then((_) => setState(() {}));
               },
             ),
           ],
@@ -69,8 +87,8 @@ class _MainState extends State<Main> {
         ),
         floatingActionButton: FloatingActionButton(
           onPressed: () {
-            //WIP
-            print("ukládám...");
+            saveData();
+            print("saved");
             setState(() {});
           },
           backgroundColor: Colors.green,
