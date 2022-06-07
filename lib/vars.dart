@@ -1,2 +1,8 @@
 String? addedClothing;
-List<String> clothes = [];
+List<String> clothes_settings = [];
+List clothes = [];
+
+class Clothing {
+  String? name;
+  int? count;
+}
