@@ -11,7 +11,20 @@ class Settings extends StatefulWidget {
 
 final TextEditingController _controller = TextEditingController();
 
+loadData() async {
+  final SharedPreferences prefs = await SharedPreferences.getInstance();
+  vars.clothes = prefs.getStringList("clothes") ?? [];
+}
+
 class _SettingsState extends State<Settings> {
+  @override
+  void didChangeDependencies() async {
+    super.didChangeDependencies();
+    await loadData();
+    setState(() {});
+    print(vars.clothes);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
