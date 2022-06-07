@@ -35,7 +35,7 @@ class _SettingsState extends State<Settings> {
                       TextButton(
                         child: const Text("Smazat"),
                         onPressed: () {
-                          vars.clothes_settings.clear();
+                          vars.clothesSettings.clear();
                           vars.clothes.clear();
                           update();
                           Navigator.pop(context);
@@ -63,13 +63,14 @@ class _SettingsState extends State<Settings> {
                       child: TextField(
                         controller: _controller,
                         decoration: InputDecoration(
+                          hintText: "Zadejte položku",
                           suffixIcon: IconButton(
                             icon: const Icon(Icons.send),
                             onPressed: () {
                               if (vars.addedClothing != null) {
-                                vars.clothes_settings.add(vars.addedClothing!);
+                                vars.clothesSettings.add(vars.addedClothing!);
                                 vars.addedClothing = null;
-                                print(vars.clothes_settings);
+                                print(vars.clothesSettings);
                                 update();
                                 _controller.clear();
                                 setState(() {});
@@ -85,7 +86,7 @@ class _SettingsState extends State<Settings> {
                   ],
                 ),
               ),
-              for (String item in vars.clothes_settings)
+              for (String item in vars.clothesSettings)
                 Container(
                   padding: const EdgeInsets.all(8),
                   child: Row(
@@ -93,15 +94,15 @@ class _SettingsState extends State<Settings> {
                       IconButton(
                         onPressed: () {
                           setState(() {
-                            vars.clothes_settings.remove(item);
+                            vars.clothesSettings.remove(item);
                             update();
-                            print(vars.clothes_settings);
+                            print(vars.clothesSettings);
                           });
                         },
                         icon: const Icon(Icons.close),
                       ),
                       Text(
-                        "$item",
+                        item,
                         style: const TextStyle(fontSize: 25),
                       ),
                     ],
@@ -117,6 +118,6 @@ class _SettingsState extends State<Settings> {
 
 update() {
   SharedPreferences.getInstance().then((prefs) {
-    prefs.setStringList("clothes-settings", vars.clothes_settings);
+    prefs.setStringList("clothes-settings", vars.clothesSettings);
   });
 }

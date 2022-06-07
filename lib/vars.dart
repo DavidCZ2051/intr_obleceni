@@ -1,5 +1,5 @@
 String? addedClothing;
-List<String> clothes_settings = [];
+List<String> clothesSettings = [];
 List clothes = [];
 
 class Clothing {

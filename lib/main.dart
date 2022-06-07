@@ -1,6 +1,3 @@
-import 'dart:js_util';
-
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:intr_obleceni/settings.dart';
@@ -24,14 +21,14 @@ class Main extends StatefulWidget {
 loadSettingsData() async {
   print("loading settings data");
   final SharedPreferences prefs = await SharedPreferences.getInstance();
-  vars.clothes_settings = prefs.getStringList("clothes-settings") ?? [];
+  vars.clothesSettings = prefs.getStringList("clothes-settings") ?? [];
   print("settings data loaded");
 }
 
 loadData() async {
   print("loading data:");
-  for (String item in vars.clothes_settings) {
-    print("${item}");
+  for (String item in vars.clothesSettings) {
+    print(item);
     vars.clothes.add(vars.Clothing()
       ..name = item
       ..count = 0);
@@ -75,7 +72,10 @@ class _MainState extends State<Main> {
             addAutomaticKeepAlives: true,
             children: [
               for (vars.Clothing clothing in vars.clothes)
-                clothingItem(clothing)
+                clothingItem(clothing),
+              const SizedBox(
+                height: 70,
+              ),
             ],
           ),
         ),
@@ -105,25 +105,28 @@ clothingItem(vars.Clothing clothing) {
         const Spacer(),
         SizedBox(
           width: 100,
-          child: Flexible(
-            child: Padding(
-              padding: const EdgeInsets.all(8),
-              child: TextField(
-                style: const TextStyle(fontSize: 20),
-                onChanged: (value) {
+          child: Padding(
+            padding: const EdgeInsets.all(8),
+            child: TextField(
+              style: const TextStyle(fontSize: 20),
+              onChanged: (value) {
+                try {
                   clothing.count = int.parse(value);
-                },
-                keyboardType: TextInputType.number,
-                decoration: InputDecoration(
-                  filled: true,
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(15),
-                    borderSide: const BorderSide(color: Colors.blue),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(15),
-                    borderSide: const BorderSide(color: Colors.blue, width: 2),
-                  ),
+                } catch (e) {
+                  return;
+                }
+              },
+              textAlign: TextAlign.center,
+              keyboardType: TextInputType.number,
+              decoration: InputDecoration(
+                filled: true,
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(15),
+                  borderSide: const BorderSide(color: Colors.blue),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(15),
+                  borderSide: const BorderSide(color: Colors.blue, width: 2),
                 ),
               ),
             ),
