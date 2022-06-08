@@ -20,18 +20,18 @@ class Main extends StatefulWidget {
 }
 
 loadData() async {
-  List<String> list = [];
   print("loading  data");
+  List<String> list = [];
   final SharedPreferences prefs = await SharedPreferences.getInstance();
   list = prefs.getStringList("clothes") ?? [];
   for (String item in list) {
-    // convert json to object
     vars.clothes.add(vars.Clothing.fromJson(jsonDecode(item)));
   }
   print("data loaded");
 }
 
 saveData() {
+  print("saving data");
   List<String> list = [];
   for (vars.Clothing clothing in vars.clothes) {
     list.add(clothing.toJson().toString());
@@ -39,7 +39,7 @@ saveData() {
   print(list);
   SharedPreferences.getInstance().then((prefs) {
     prefs.setStringList("clothes", list);
-    print("saved");
+    print("data saved");
   });
 }
 
@@ -85,14 +85,35 @@ class _MainState extends State<Main> {
             ],
           ),
         ),
-        floatingActionButton: FloatingActionButton(
-          onPressed: () {
-            saveData();
-            print("saved");
-            setState(() {});
-          },
-          backgroundColor: Colors.green,
-          child: const Icon(Icons.done),
+        floatingActionButton: Row(
+          mainAxisAlignment: MainAxisAlignment.end,
+          crossAxisAlignment: CrossAxisAlignment.end,
+          children: [
+            FloatingActionButton(
+              heroTag: "btn1",
+              onPressed: () {
+                for (vars.Clothing clothing in vars.clothes) {
+                  clothing.count = 0;
+                }
+                saveData();
+                setState(() {});
+              },
+              child: const Icon(Icons.restore),
+              mini: true,
+            ),
+            const SizedBox(
+              width: 8,
+            ),
+            FloatingActionButton(
+              heroTag: "btn2",
+              onPressed: () {
+                saveData();
+                setState(() {});
+              },
+              backgroundColor: Colors.green,
+              child: const Icon(Icons.done),
+            ),
+          ],
         ),
       ),
     );
@@ -116,10 +137,16 @@ clothingItem(vars.Clothing clothing) {
             child: TextField(
               style: const TextStyle(fontSize: 20),
               onChanged: (value) {
-                try {
-                  clothing.count = int.parse(value);
-                } catch (e) {
-                  return;
+                if (value == "") {
+                  clothing.count = 0;
+                } else {
+                  try {
+                    clothing.count = int.parse(value);
+                    print("parsed to int");
+                  } catch (e) {
+                    print("error");
+                    return;
+                  }
                 }
               },
               textAlign: TextAlign.center,

@@ -17,6 +17,13 @@ class _SettingsState extends State<Settings> {
     return SafeArea(
       child: Scaffold(
         appBar: AppBar(
+          leading: IconButton(
+            tooltip: "Zpět",
+            icon: const Icon(Icons.arrow_back),
+            onPressed: () {
+              Navigator.pop(context);
+            },
+          ),
           title: const Text("Nastavení"),
           actions: [
             IconButton(

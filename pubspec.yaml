@@ -33,19 +33,23 @@ dependencies:
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
-  cupertino_icons: ^1.0.2
   shared_preferences: ^2.0.15
-  msix: ^2.8.18
 
 msix_config:
   display_name: Intr - Oblečení
   publisher_display_name: David Vobruba
-  identity_name: com.example.intr-obleceni
+  identity_name: com.david.intr-obleceni
   msix_version: 1.0.0.0
+
+flutter_icons:
+  android: true
+  image_path: "assets/app_logo.png"
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
+  msix: ^2.8.18
+  flutter_launcher_icons: ^0.9.3
 
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the package is
