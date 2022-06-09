@@ -24,7 +24,7 @@ class _SettingsState extends State<Settings> {
               Navigator.pop(context);
             },
           ),
-          title: const Text("Nastavení"),
+          title: Text("Nastavení - Verze: ${vars.version}"),
           actions: [
             IconButton(
               tooltip: "Smazat data",
@@ -76,15 +76,34 @@ class _SettingsState extends State<Settings> {
                             icon: const Icon(Icons.send),
                             onPressed: () {
                               if (vars.addedClothing != null) {
-                                vars.clothes.add(
-                                  vars.Clothing(
-                                    name: vars.addedClothing,
-                                    count: 0,
-                                  ),
-                                );
+                                if (vars.addedClothing!.contains("\"") ||
+                                    vars.addedClothing!.contains("\\")) {
+                                  showDialog(
+                                    context: context,
+                                    builder: (context) => AlertDialog(
+                                      title:
+                                          const Text("Nelze přidat položku!"),
+                                      content: const Text(
+                                          "Položka obsahuje nepovolené znaky."),
+                                      actions: [
+                                        TextButton(
+                                          child: const Text("Zavřít"),
+                                          onPressed: () =>
+                                              Navigator.pop(context),
+                                        ),
+                                      ],
+                                    ),
+                                  );
+                                } else {
+                                  vars.clothes.add(
+                                    vars.Clothing(
+                                      name: vars.addedClothing,
+                                      count: 0,
+                                    ),
+                                  );
+                                  saveData();
+                                }
                                 vars.addedClothing = null;
-                                print(vars.clothes);
-                                saveData();
                                 _controller.clear();
                                 setState(() {});
                               }
@@ -109,15 +128,72 @@ class _SettingsState extends State<Settings> {
                         onPressed: () {
                           vars.clothes.remove(clothing);
                           saveData();
-                          print(vars.clothes);
                           setState(() {});
                         },
                         icon: const Icon(Icons.close),
                       ),
-                      Text(
-                        clothing.name!,
-                        style: const TextStyle(fontSize: 25),
+                      Expanded(
+                        flex: 10,
+                        child: Text(
+                          clothing.name!,
+                          style: const TextStyle(fontSize: 25),
+                        ),
                       ),
+                      const Spacer(),
+                      IconButton(
+                        tooltip: "Upravit název",
+                        onPressed: () {
+                          showDialog(
+                            context: context,
+                            builder: (context) => AlertDialog(
+                              title: const Text("Zadejte nový název"),
+                              content: TextField(
+                                onChanged: (value) {
+                                  vars.newName = value;
+                                },
+                              ),
+                              actions: [
+                                TextButton(
+                                  child: const Text("Zrušit"),
+                                  onPressed: () => Navigator.pop(context),
+                                ),
+                                TextButton(
+                                  child: const Text("OK"),
+                                  onPressed: () {
+                                    if (vars.newName != null) {
+                                      if (vars.newName!.contains("\"") ||
+                                          vars.newName!.contains("\\")) {
+                                        showDialog(
+                                          context: context,
+                                          builder: (context) => AlertDialog(
+                                            title: const Text(
+                                                "Nelze přidat položku!"),
+                                            content: const Text(
+                                                "Položka obsahuje nepovolené znaky."),
+                                            actions: [
+                                              TextButton(
+                                                child: const Text("Zavřít"),
+                                                onPressed: () =>
+                                                    Navigator.pop(context),
+                                              ),
+                                            ],
+                                          ),
+                                        );
+                                      } else {
+                                        clothing.name = vars.newName;
+                                        saveData();
+                                        Navigator.pop(context);
+                                        setState(() {});
+                                      }
+                                    }
+                                  },
+                                ),
+                              ],
+                            ),
+                          );
+                        },
+                        icon: const Icon(Icons.edit),
+                      )
                     ],
                   ),
                 ),
@@ -134,7 +210,6 @@ saveData() {
   for (vars.Clothing clothing in vars.clothes) {
     list.add(clothing.toJson().toString());
   }
-  print(list);
   SharedPreferences.getInstance().then((prefs) {
     prefs.setStringList("clothes", list);
     print("saved");

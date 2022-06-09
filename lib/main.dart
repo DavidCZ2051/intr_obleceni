@@ -4,13 +4,15 @@ import 'package:intr_obleceni/settings.dart';
 import 'dart:convert';
 import 'package:intr_obleceni/vars.dart' as vars;
 
-void main() => runApp(
-      const MaterialApp(
-        home: Main(),
-        debugShowCheckedModeBanner: false,
-        title: "Intr - seznam oblečení",
-      ),
-    );
+main() {
+  runApp(
+    const MaterialApp(
+      home: Main(),
+      debugShowCheckedModeBanner: false,
+      title: "Intr - seznam oblečení",
+    ),
+  );
+}
 
 class Main extends StatefulWidget {
   const Main({Key? key}) : super(key: key);
@@ -36,7 +38,7 @@ saveData() {
   for (vars.Clothing clothing in vars.clothes) {
     list.add(clothing.toJson().toString());
   }
-  print(list);
+  print("saved: $list");
   SharedPreferences.getInstance().then((prefs) {
     prefs.setStringList("clothes", list);
     print("data saved");
@@ -125,9 +127,12 @@ clothingItem(vars.Clothing clothing) {
     padding: const EdgeInsets.all(8),
     child: Row(
       children: <Widget>[
-        Text(
-          "${clothing.count}x ${clothing.name}",
-          style: const TextStyle(fontSize: 30),
+        Expanded(
+          flex: 10,
+          child: Text(
+            "${clothing.count}x ${clothing.name}",
+            style: const TextStyle(fontSize: 30),
+          ),
         ),
         const Spacer(),
         SizedBox(
@@ -142,9 +147,7 @@ clothingItem(vars.Clothing clothing) {
                 } else {
                   try {
                     clothing.count = int.parse(value);
-                    print("parsed to int");
                   } catch (e) {
-                    print("error");
                     return;
                   }
                 }

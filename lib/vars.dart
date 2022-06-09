@@ -1,5 +1,7 @@
 String? addedClothing;
+String? newName;
 List<Clothing> clothes = [];
+String version = "1.1.0";
 
 class Clothing {
   Clothing({this.name, this.count});
