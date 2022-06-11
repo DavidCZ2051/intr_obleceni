@@ -80,7 +80,7 @@ class _MainState extends State<Main> {
             addAutomaticKeepAlives: true,
             children: [
               for (vars.Clothing clothing in vars.clothes)
-                clothingItem(clothing),
+                ClothingItem(clothing: clothing),
               const SizedBox(
                 height: 70,
               ),
@@ -122,53 +122,70 @@ class _MainState extends State<Main> {
   }
 }
 
-clothingItem(vars.Clothing clothing) {
-  return Container(
-    padding: const EdgeInsets.all(8),
-    child: Row(
-      children: <Widget>[
-        Expanded(
-          flex: 10,
-          child: Text(
-            "${clothing.count}x ${clothing.name}",
-            style: const TextStyle(fontSize: 30),
+class ClothingItem extends StatefulWidget {
+  const ClothingItem({Key? key, required this.clothing}) : super(key: key);
+
+  final vars.Clothing clothing;
+
+  @override
+  State<ClothingItem> createState() => _ClothingItemState();
+}
+
+class _ClothingItemState extends State<ClothingItem> {
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(8),
+      child: Row(
+        children: <Widget>[
+          Expanded(
+            flex: 10,
+            child: Text(
+              "${widget.clothing.count}x ${widget.clothing.name}",
+              style: const TextStyle(fontSize: 30),
+            ),
           ),
-        ),
-        const Spacer(),
-        SizedBox(
-          width: 100,
-          child: Padding(
-            padding: const EdgeInsets.all(8),
-            child: TextField(
-              style: const TextStyle(fontSize: 20),
-              onChanged: (value) {
-                if (value == "") {
-                  clothing.count = 0;
-                } else {
+          const Spacer(),
+          IconButton(
+            tooltip: "Resetovat počet",
+            onPressed: () {
+              widget.clothing.count = 0;
+              setState(() {});
+              saveData();
+            },
+            icon: const Icon(Icons.restore),
+          ),
+          SizedBox(
+            width: 100,
+            child: Padding(
+              padding: const EdgeInsets.all(8),
+              child: TextField(
+                style: const TextStyle(fontSize: 20),
+                onChanged: (value) {
                   try {
-                    clothing.count = int.parse(value);
+                    widget.clothing.count = int.parse(value);
                   } catch (e) {
                     return;
                   }
-                }
-              },
-              textAlign: TextAlign.center,
-              keyboardType: TextInputType.number,
-              decoration: InputDecoration(
-                filled: true,
-                enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(15),
-                  borderSide: const BorderSide(color: Colors.blue),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(15),
-                  borderSide: const BorderSide(color: Colors.blue, width: 2),
+                },
+                textAlign: TextAlign.center,
+                keyboardType: TextInputType.number,
+                decoration: InputDecoration(
+                  filled: true,
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(15),
+                    borderSide: const BorderSide(color: Colors.blue),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(15),
+                    borderSide: const BorderSide(color: Colors.blue, width: 2),
+                  ),
                 ),
               ),
             ),
           ),
-        ),
-      ],
-    ),
-  );
+        ],
+      ),
+    );
+  }
 }
