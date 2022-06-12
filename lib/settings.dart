@@ -97,7 +97,7 @@ class _SettingsState extends State<Settings> {
                                 } else {
                                   vars.clothes.add(
                                     vars.Clothing(
-                                      name: vars.addedClothing,
+                                      name: vars.addedClothing!.trim(),
                                       count: 0,
                                     ),
                                   );
@@ -180,7 +180,7 @@ class _SettingsState extends State<Settings> {
                                           ),
                                         );
                                       } else {
-                                        clothing.name = vars.newName;
+                                        clothing.name = vars.newName!.trim();
                                         saveData();
                                         Navigator.pop(context);
                                         setState(() {});
