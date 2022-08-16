@@ -1,2 +1,2 @@
 # intr_obleceni
- Aplikace, která má za úkol usnadňovat život lidem ubytovaným na internátu.
+ Aplikace, postavená ve Flutteru, určená pro snadný zápis oblečení ve skříni na intru :D
