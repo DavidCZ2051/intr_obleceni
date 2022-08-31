@@ -59,6 +59,7 @@ class _MainState extends State<Main> {
       child: Scaffold(
         appBar: AppBar(
           title: const Text("Internát - seznam oblečení"),
+          elevation: 2,
           actions: [
             IconButton(
               tooltip: "Nastavení",
@@ -71,52 +72,87 @@ class _MainState extends State<Main> {
               },
             ),
           ],
-          elevation: 2,
         ),
         body: Scrollbar(
           radius: const Radius.circular(10),
           thickness: 7,
-          child: ListView(
-            addAutomaticKeepAlives: true,
-            children: [
-              for (vars.Clothing clothing in vars.clothes)
-                ClothingItem(clothing: clothing),
-              const SizedBox(
-                height: 70,
-              ),
-            ],
-          ),
+          child: (vars.clothes.isNotEmpty)
+              ? SingleChildScrollView(
+                  child: Column(
+                    children: [
+                      for (vars.Clothing clothing in vars.clothes)
+                        ClothingItem(clothing: clothing),
+                      const SizedBox(
+                        height: 70,
+                      ),
+                    ],
+                  ),
+                )
+              : const Center(
+                  child: Text(
+                    "Zatím žádná položka",
+                    style: TextStyle(fontSize: 25),
+                  ),
+                ),
         ),
-        floatingActionButton: Row(
-          mainAxisAlignment: MainAxisAlignment.end,
-          crossAxisAlignment: CrossAxisAlignment.end,
-          children: [
-            FloatingActionButton(
-              heroTag: "btn1",
-              onPressed: () {
-                for (vars.Clothing clothing in vars.clothes) {
-                  clothing.count = 0;
-                }
-                saveData();
-                setState(() {});
-              },
-              child: const Icon(Icons.restore),
-              mini: true,
-            ),
-            const SizedBox(
-              width: 8,
-            ),
-            FloatingActionButton(
-              heroTag: "btn2",
-              onPressed: () {
-                saveData();
-                setState(() {});
-              },
-              backgroundColor: Colors.green,
-              child: const Icon(Icons.done),
-            ),
-          ],
-        ),
+        floatingActionButton: (vars.clothes.isNotEmpty)
+            ? Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  FloatingActionButton(
+                    tooltip: "Resetovat počet",
+                    heroTag: "btn1",
+                    child: const Icon(Icons.restore),
+                    mini: true,
+                    onPressed: () {
+                      showDialog(
+                        context: context,
+                        builder: (context) {
+                          return AlertDialog(
+                            title: const Text("Resetovat počet položek?"),
+                            content: const Text(
+                                "Opravdu chcete resetovat počet všech položek?"),
+                            actions: [
+                              TextButton(
+                                child: const Text("Zrušit"),
+                                onPressed: () {
+                                  Navigator.pop(context);
+                                },
+                              ),
+                              ElevatedButton(
+                                child: const Text("Ano"),
+                                onPressed: () {
+                                  for (vars.Clothing clothing in vars.clothes) {
+                                    clothing.count = 0;
+                                  }
+                                  saveData();
+                                  setState(() {});
+                                  Navigator.pop(context);
+                                },
+                              ),
+                            ],
+                          );
+                        },
+                      );
+                    },
+                  ),
+                  const SizedBox(
+                    width: 8,
+                  ),
+                  FloatingActionButton(
+                    tooltip: "Uložit",
+                    heroTag: "btn2",
+                    backgroundColor: Colors.green,
+                    child: const Icon(Icons.done),
+                    onPressed: () {
+                      saveData();
+                      setState(() {});
+                    },
+                  ),
+                ],
+              )
+            : null,
       ),
     );
   }
@@ -140,9 +176,26 @@ class _ClothingItemState extends State<ClothingItem> {
         children: <Widget>[
           Expanded(
             flex: 10,
-            child: Text(
-              "${widget.clothing.count}x ${widget.clothing.name}",
-              style: const TextStyle(fontSize: 30),
+            child: RichText(
+              text: TextSpan(
+                children: <TextSpan>[
+                  TextSpan(
+                    text: "${widget.clothing.count}x ",
+                    style: const TextStyle(
+                      color: Colors.blue,
+                      fontSize: 30,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  TextSpan(
+                    text: widget.clothing.name,
+                    style: const TextStyle(
+                      color: Colors.black,
+                      fontSize: 30,
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
           const Spacer(),

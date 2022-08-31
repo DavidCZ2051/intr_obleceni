@@ -24,7 +24,7 @@ class _SettingsState extends State<Settings> {
               Navigator.pop(context);
             },
           ),
-          title: Text("Nastavení - Verze: ${vars.version}"),
+          title: const Text("Nastavení"),
           actions: [
             IconButton(
               tooltip: "Smazat data",
@@ -33,14 +33,14 @@ class _SettingsState extends State<Settings> {
                 showDialog(
                   context: context,
                   builder: (context) => AlertDialog(
-                    title: const Text("Smazat všechny data?"),
+                    title: const Text("Smazat všechna data?"),
                     content: const Text("Tato akce je nevratná."),
                     actions: [
                       TextButton(
                         child: const Text("Zrušit"),
                         onPressed: () => Navigator.pop(context),
                       ),
-                      TextButton(
+                      ElevatedButton(
                         child: const Text("Smazat"),
                         onPressed: () {
                           vars.clothes.clear();
@@ -197,6 +197,29 @@ class _SettingsState extends State<Settings> {
                     ],
                   ),
                 ),
+              Center(
+                child: Column(
+                  children: [
+                    const SizedBox(
+                      height: 30,
+                    ),
+                    Text(
+                      "Verze: ${vars.version}",
+                      style: const TextStyle(fontSize: 20),
+                    ),
+                    const Padding(
+                      padding: EdgeInsets.all(8.0),
+                      child: FlutterLogo(
+                        size: 70,
+                      ),
+                    ),
+                    const Text(
+                      "Made by David Vobruba using Flutter",
+                      style: TextStyle(fontSize: 15),
+                    ),
+                  ],
+                ),
+              ),
             ],
           ),
         ),

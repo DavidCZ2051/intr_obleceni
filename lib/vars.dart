@@ -1,10 +1,10 @@
 String? addedClothing;
 String? newName;
 List<Clothing> clothes = [];
-String version = "1.2.0";
+String version = "1.3.0";
 
 class Clothing {
-  Clothing({this.name, this.count});
+  Clothing({required this.name, required this.count});
   String? name;
   int? count;
 
