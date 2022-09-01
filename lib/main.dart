@@ -4,12 +4,17 @@ import 'package:intr_obleceni/settings.dart';
 import 'dart:convert';
 import 'package:intr_obleceni/vars.dart' as vars;
 
-main() {
+main() async {
+  await loadData();
   runApp(
-    const MaterialApp(
-      home: Main(),
+    MaterialApp(
+      home: const Main(),
       debugShowCheckedModeBanner: false,
       title: "Intr - seznam oblečení",
+      theme: ThemeData(
+        primarySwatch: vars.materialColorMaker(vars.hexColor!),
+        brightness: Brightness.light,
+      ),
     ),
   );
 }
@@ -29,6 +34,7 @@ loadData() async {
   for (String item in list) {
     vars.clothes.add(vars.Clothing.fromJson(jsonDecode(item)));
   }
+  vars.hexColor = prefs.getString("color") ?? "2196f3";
   print("data loaded");
 }
 
@@ -47,17 +53,11 @@ saveData() {
 
 class _MainState extends State<Main> {
   @override
-  void didChangeDependencies() async {
-    super.didChangeDependencies();
-    await loadData();
-    setState(() {});
-  }
-
-  @override
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
         appBar: AppBar(
+          backgroundColor: Theme.of(context).primaryColor,
           title: const Text("Internát - seznam oblečení"),
           elevation: 2,
           actions: [
@@ -181,8 +181,8 @@ class _ClothingItemState extends State<ClothingItem> {
                 children: <TextSpan>[
                   TextSpan(
                     text: "${widget.clothing.count}x ",
-                    style: const TextStyle(
-                      color: Colors.blue,
+                    style: TextStyle(
+                      color: Theme.of(context).primaryColor,
                       fontSize: 30,
                       fontWeight: FontWeight.bold,
                     ),
@@ -227,11 +227,16 @@ class _ClothingItemState extends State<ClothingItem> {
                   filled: true,
                   enabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(15),
-                    borderSide: const BorderSide(color: Colors.blue),
+                    borderSide: BorderSide(
+                      color: Theme.of(context).primaryColor,
+                    ),
                   ),
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(15),
-                    borderSide: const BorderSide(color: Colors.blue, width: 2),
+                    borderSide: BorderSide(
+                      color: Theme.of(context).primaryColor,
+                      width: 2,
+                    ),
                   ),
                 ),
               ),

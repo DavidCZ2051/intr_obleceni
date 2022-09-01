@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:intr_obleceni/vars.dart' as vars;
 
 class Settings extends StatefulWidget {
@@ -197,11 +198,54 @@ class _SettingsState extends State<Settings> {
                     ],
                   ),
                 ),
+              const Divider(
+                thickness: 2,
+              ),
+              ElevatedButton(
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: const <Widget>[
+                    Icon(Icons.color_lens),
+                    Text("Změnit barvu"),
+                  ],
+                ),
+                onPressed: () {
+                  showDialog(
+                    context: context,
+                    builder: (_) => AlertDialog(
+                      title: const Text("Vyberte si barvu"),
+                      content: SingleChildScrollView(
+                        child: BlockPicker(
+                          pickerColor: const Color(0x00000000),
+                          onColorChanged: (color) {
+                            vars.hexColor = vars.colorToHex(color);
+                            setState(() {});
+                          },
+                        ),
+                      ),
+                      actions: <Widget>[
+                        ElevatedButton(
+                          child: const Text("Potvrdit"),
+                          onPressed: () {
+                            setState(() {
+                              saveData();
+                            });
+                            Navigator.of(context).pop();
+                          },
+                        ),
+                      ],
+                    ),
+                  );
+                },
+              ),
+              const Divider(
+                thickness: 2,
+              ),
               Center(
                 child: Column(
                   children: [
                     const SizedBox(
-                      height: 30,
+                      height: 10,
                     ),
                     Text(
                       "Verze: ${vars.version}",
@@ -235,6 +279,6 @@ saveData() {
   }
   SharedPreferences.getInstance().then((prefs) {
     prefs.setStringList("clothes", list);
-    print("saved");
+    prefs.setString("color", vars.hexColor!);
   });
 }
