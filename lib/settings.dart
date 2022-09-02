@@ -15,13 +15,14 @@ class Settings extends StatefulWidget {
 final TextEditingController _controller = TextEditingController();
 
 class _SettingsState extends State<Settings> {
-  late String newColor;
+  String? newColor;
 
   @override
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
         appBar: AppBar(
+          backgroundColor: Theme.of(context).primaryColor,
           leading: IconButton(
             tooltip: "Zpět",
             icon: const Icon(Icons.arrow_back),

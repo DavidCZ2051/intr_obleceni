@@ -5,6 +5,7 @@ String? newName;
 List<Clothing> clothes = [];
 String version = "1.4.0-DEV";
 String? hexColor;
+String theme = "system";
 
 String colorToHex(Color color) {
   return color.value.toRadixString(16).substring(2, 8);

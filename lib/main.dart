@@ -11,9 +11,17 @@ main() async {
       home: const Main(),
       debugShowCheckedModeBanner: false,
       title: "Intr - seznam oblečení",
+      themeMode: getThemeMode(),
+      color: vars.materialColorMaker(vars.hexColor!),
       theme: ThemeData(
         primarySwatch: vars.materialColorMaker(vars.hexColor!),
+        primaryColor: vars.materialColorMaker(vars.hexColor!),
         brightness: Brightness.light,
+      ),
+      darkTheme: ThemeData(
+        primarySwatch: vars.materialColorMaker(vars.hexColor!),
+        primaryColor: vars.materialColorMaker(vars.hexColor!),
+        brightness: Brightness.dark,
       ),
     ),
   );
@@ -26,6 +34,16 @@ class Main extends StatefulWidget {
   _MainState createState() => _MainState();
 }
 
+ThemeMode getThemeMode() {
+  if (vars.theme == "dark") {
+    return ThemeMode.dark;
+  } else if (vars.theme == "light") {
+    return ThemeMode.light;
+  } else {
+    return ThemeMode.system;
+  }
+}
+
 loadData() async {
   print("loading  data");
   List<String> list = [];
@@ -35,6 +53,7 @@ loadData() async {
     vars.clothes.add(vars.Clothing.fromJson(jsonDecode(item)));
   }
   vars.hexColor = prefs.getString("color") ?? "2196f3";
+  vars.theme = prefs.getString("theme") ?? "system";
   print("data loaded");
 }
 
@@ -101,6 +120,7 @@ class _MainState extends State<Main> {
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
                   FloatingActionButton(
+                    backgroundColor: Theme.of(context).primaryColor,
                     tooltip: "Resetovat počet",
                     heroTag: "btn1",
                     child: const Icon(Icons.restore),
@@ -189,8 +209,10 @@ class _ClothingItemState extends State<ClothingItem> {
                   ),
                   TextSpan(
                     text: widget.clothing.name,
-                    style: const TextStyle(
-                      color: Colors.black,
+                    style: TextStyle(
+                      color: (Theme.of(context).brightness == Brightness.dark)
+                          ? Colors.white
+                          : Colors.black,
                       fontSize: 30,
                     ),
                   ),
