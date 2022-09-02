@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:intr_obleceni/vars.dart' as vars;
+import 'package:flutter/services.dart';
+import 'dart:io';
 
 class Settings extends StatefulWidget {
   const Settings({Key? key}) : super(key: key);
@@ -13,6 +15,8 @@ class Settings extends StatefulWidget {
 final TextEditingController _controller = TextEditingController();
 
 class _SettingsState extends State<Settings> {
+  late String newColor;
+
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -142,6 +146,7 @@ class _SettingsState extends State<Settings> {
                       ),
                       const Spacer(),
                       IconButton(
+                        icon: const Icon(Icons.edit),
                         tooltip: "Upravit název",
                         onPressed: () {
                           showDialog(
@@ -193,7 +198,6 @@ class _SettingsState extends State<Settings> {
                             ),
                           );
                         },
-                        icon: const Icon(Icons.edit),
                       )
                     ],
                   ),
@@ -216,9 +220,9 @@ class _SettingsState extends State<Settings> {
                       title: const Text("Vyberte si barvu"),
                       content: SingleChildScrollView(
                         child: BlockPicker(
-                          pickerColor: const Color(0x00000000),
+                          pickerColor: vars.materialColorMaker(vars.hexColor!),
                           onColorChanged: (color) {
-                            vars.hexColor = vars.colorToHex(color);
+                            newColor = vars.colorToHex(color);
                             setState(() {});
                           },
                         ),
@@ -227,10 +231,32 @@ class _SettingsState extends State<Settings> {
                         ElevatedButton(
                           child: const Text("Potvrdit"),
                           onPressed: () {
-                            setState(() {
-                              saveData();
-                            });
+                            vars.hexColor = newColor;
+                            saveData();
+                            setState(() {});
                             Navigator.of(context).pop();
+                            showDialog(
+                              context: context,
+                              builder: (_) => AlertDialog(
+                                title: const Text(
+                                    "Pro zobrazení změny je nutné restartovat aplikaci."),
+                                actions: <Widget>[
+                                  TextButton(
+                                      child: const Text("Později"),
+                                      onPressed: () => Navigator.pop(context)),
+                                  ElevatedButton(
+                                    child: const Text("Restartovat"),
+                                    onPressed: () {
+                                      if (Platform.isAndroid) {
+                                        SystemNavigator.pop();
+                                      } else {
+                                        exit(0);
+                                      }
+                                    },
+                                  ),
+                                ],
+                              ),
+                            );
                           },
                         ),
                       ],
