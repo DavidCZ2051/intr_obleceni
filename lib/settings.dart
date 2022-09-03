@@ -14,6 +14,9 @@ class Settings extends StatefulWidget {
 
 final TextEditingController _controller = TextEditingController();
 
+List<String> modes = ["system", "dark", "light"];
+String mode = modes[0];
+
 class _SettingsState extends State<Settings> {
   String? newColor;
 
@@ -31,7 +34,7 @@ class _SettingsState extends State<Settings> {
             },
           ),
           title: const Text("Nastavení"),
-          actions: [
+          actions: <Widget>[
             IconButton(
               tooltip: "Smazat data",
               icon: const Icon(Icons.delete),
@@ -41,7 +44,7 @@ class _SettingsState extends State<Settings> {
                   builder: (context) => AlertDialog(
                     title: const Text("Smazat všechna data?"),
                     content: const Text("Tato akce je nevratná."),
-                    actions: [
+                    actions: <Widget>[
                       TextButton(
                         child: const Text("Zrušit"),
                         onPressed: () => Navigator.pop(context),
@@ -67,11 +70,11 @@ class _SettingsState extends State<Settings> {
           radius: const Radius.circular(10),
           thickness: 7,
           child: ListView(
-            children: [
+            children: <Widget>[
               Container(
                 padding: const EdgeInsets.all(8),
                 child: Row(
-                  children: [
+                  children: <Widget>[
                     Flexible(
                       child: TextField(
                         controller: _controller,
@@ -91,7 +94,7 @@ class _SettingsState extends State<Settings> {
                                           const Text("Nelze přidat položku!"),
                                       content: const Text(
                                           "Položka obsahuje nepovolené znaky."),
-                                      actions: [
+                                      actions: <Widget>[
                                         TextButton(
                                           child: const Text("Zavřít"),
                                           onPressed: () =>
@@ -159,7 +162,7 @@ class _SettingsState extends State<Settings> {
                                   vars.newName = value;
                                 },
                               ),
-                              actions: [
+                              actions: <Widget>[
                                 TextButton(
                                   child: const Text("Zrušit"),
                                   onPressed: () => Navigator.pop(context),
@@ -177,7 +180,7 @@ class _SettingsState extends State<Settings> {
                                                 "Nelze přidat položku!"),
                                             content: const Text(
                                                 "Položka obsahuje nepovolené znaky."),
-                                            actions: [
+                                            actions: <Widget>[
                                               TextButton(
                                                 child: const Text("Zavřít"),
                                                 onPressed: () =>
@@ -206,71 +209,214 @@ class _SettingsState extends State<Settings> {
               const Divider(
                 thickness: 2,
               ),
-              ElevatedButton(
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: const <Widget>[
-                    Icon(Icons.color_lens),
-                    Text("Změnit barvu"),
-                  ],
-                ),
-                onPressed: () {
-                  showDialog(
-                    context: context,
-                    builder: (_) => AlertDialog(
-                      title: const Text("Vyberte si barvu"),
-                      content: SingleChildScrollView(
-                        child: BlockPicker(
-                          pickerColor: vars.materialColorMaker(vars.hexColor!),
-                          onColorChanged: (color) {
-                            newColor = vars.colorToHex(color);
-                            setState(() {});
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  ElevatedButton(
+                    onPressed: () {
+                      showDialog(
+                        context: context,
+                        builder: (_) => WillPopScope(
+                          onWillPop: () async {
+                            mode = mode;
+                            return true;
                           },
-                        ),
-                      ),
-                      actions: <Widget>[
-                        ElevatedButton(
-                          child: const Text("Potvrdit"),
-                          onPressed: () {
-                            vars.hexColor = newColor;
-                            saveData();
-                            setState(() {});
-                            Navigator.of(context).pop();
-                            showDialog(
-                              context: context,
-                              builder: (_) => AlertDialog(
-                                title: const Text(
-                                    "Pro zobrazení změny je nutné restartovat aplikaci."),
-                                actions: <Widget>[
-                                  TextButton(
-                                      child: const Text("Později"),
-                                      onPressed: () => Navigator.pop(context)),
-                                  ElevatedButton(
-                                    child: const Text("Restartovat"),
-                                    onPressed: () {
-                                      if (Platform.isAndroid) {
-                                        SystemNavigator.pop();
-                                      } else {
-                                        exit(0);
-                                      }
+                          child: AlertDialog(
+                            title: const Text("Vyberte mód"),
+                            content: StatefulBuilder(builder:
+                                (BuildContext context, StateSetter setState) {
+                              return Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: <Widget>[
+                                  ListTile(
+                                    onTap: () {
+                                      mode = modes[2];
+                                      setState(() {});
                                     },
+                                    title: const Text("Světlý"),
+                                    leading: Radio(
+                                      activeColor:
+                                          Theme.of(context).primaryColor,
+                                      value: modes[2],
+                                      groupValue: mode,
+                                      onChanged: (value) {
+                                        setState(() {
+                                          mode = value.toString();
+                                        });
+                                      },
+                                    ),
+                                  ),
+                                  ListTile(
+                                    onTap: () {
+                                      mode = modes[1];
+                                      setState(() {});
+                                    },
+                                    title: const Text("Tmavý"),
+                                    leading: Radio(
+                                      activeColor:
+                                          Theme.of(context).primaryColor,
+                                      value: modes[1],
+                                      groupValue: mode,
+                                      onChanged: (value) {
+                                        setState(() {
+                                          mode = value.toString();
+                                        });
+                                      },
+                                    ),
+                                  ),
+                                  ListTile(
+                                    onTap: () {
+                                      mode = modes[0];
+                                      setState(() {});
+                                    },
+                                    title: const Text("Podle systému"),
+                                    leading: Radio(
+                                      activeColor:
+                                          Theme.of(context).primaryColor,
+                                      value: modes[0],
+                                      groupValue: mode,
+                                      onChanged: (value) {
+                                        setState(() {
+                                          mode = value.toString();
+                                        });
+                                      },
+                                    ),
                                   ),
                                 ],
+                              );
+                            }),
+                            actions: <Widget>[
+                              TextButton(
+                                child: const Text("Zavřít"),
+                                onPressed: () {
+                                  mode = vars.theme;
+                                  Navigator.pop(context);
+                                },
                               ),
-                            );
-                          },
+                              ElevatedButton(
+                                child: const Text("Potvrdit"),
+                                onPressed: () {
+                                  vars.theme = mode;
+                                  saveData();
+                                  setState(() {});
+                                  Navigator.of(context).pop();
+                                  showDialog(
+                                    context: context,
+                                    builder: (_) => AlertDialog(
+                                      title: const Text(
+                                          "Pro zobrazení změny je nutné restartovat aplikaci."),
+                                      actions: <Widget>[
+                                        TextButton(
+                                            child: const Text("Později"),
+                                            onPressed: () =>
+                                                Navigator.pop(context)),
+                                        ElevatedButton(
+                                          child: const Text("Restartovat"),
+                                          onPressed: () {
+                                            if (Platform.isAndroid) {
+                                              SystemNavigator.pop();
+                                            } else {
+                                              exit(0);
+                                            }
+                                          },
+                                        ),
+                                      ],
+                                    ),
+                                  );
+                                },
+                              ),
+                            ],
+                          ),
                         ),
+                      );
+                    },
+                    child: Row(
+                      children: <Widget>[
+                        Icon((Theme.of(context).brightness == Brightness.dark)
+                            ? Icons.light_mode
+                            : Icons.dark_mode),
+                        const SizedBox(width: 5),
+                        const Text("Změnit mód"),
                       ],
                     ),
-                  );
-                },
+                  ),
+                  const SizedBox(width: 20),
+                  ElevatedButton(
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: const <Widget>[
+                        Icon(Icons.color_lens),
+                        SizedBox(
+                          width: 5,
+                        ),
+                        Text("Změnit barvu"),
+                      ],
+                    ),
+                    onPressed: () {
+                      showDialog(
+                        context: context,
+                        builder: (_) => AlertDialog(
+                          title: const Text("Vyberte si barvu"),
+                          content: SingleChildScrollView(
+                            child: BlockPicker(
+                              pickerColor:
+                                  vars.materialColorMaker(vars.hexColor!),
+                              onColorChanged: (color) {
+                                newColor = vars.colorToHex(color);
+                                setState(() {});
+                              },
+                            ),
+                          ),
+                          actions: <Widget>[
+                            TextButton(
+                              child: const Text("Zrušit"),
+                              onPressed: () => Navigator.pop(context),
+                            ),
+                            ElevatedButton(
+                              child: const Text("Potvrdit"),
+                              onPressed: () {
+                                vars.hexColor = newColor;
+                                saveData();
+                                setState(() {});
+                                Navigator.of(context).pop();
+                                showDialog(
+                                  context: context,
+                                  builder: (_) => AlertDialog(
+                                    title: const Text(
+                                        "Pro zobrazení změny je nutné restartovat aplikaci."),
+                                    actions: <Widget>[
+                                      TextButton(
+                                          child: const Text("Později"),
+                                          onPressed: () =>
+                                              Navigator.pop(context)),
+                                      ElevatedButton(
+                                        child: const Text("Restartovat"),
+                                        onPressed: () {
+                                          if (Platform.isAndroid) {
+                                            SystemNavigator.pop();
+                                          } else {
+                                            exit(0);
+                                          }
+                                        },
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              },
+                            ),
+                          ],
+                        ),
+                      );
+                    },
+                  ),
+                ],
               ),
               const Divider(
                 thickness: 2,
               ),
               Center(
                 child: Column(
-                  children: [
+                  children: <Widget>[
                     const SizedBox(
                       height: 10,
                     ),
@@ -307,5 +453,6 @@ saveData() {
   SharedPreferences.getInstance().then((prefs) {
     prefs.setStringList("clothes", list);
     prefs.setString("color", vars.hexColor!);
+    prefs.setString("theme", vars.theme);
   });
 }

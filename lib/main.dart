@@ -45,7 +45,7 @@ ThemeMode getThemeMode() {
 }
 
 loadData() async {
-  print("loading  data");
+  debugPrint("loading  data");
   List<String> list = [];
   final SharedPreferences prefs = await SharedPreferences.getInstance();
   list = prefs.getStringList("clothes") ?? [];
@@ -54,19 +54,20 @@ loadData() async {
   }
   vars.hexColor = prefs.getString("color") ?? "2196f3";
   vars.theme = prefs.getString("theme") ?? "system";
-  print("data loaded");
+  mode = vars.theme;
+  debugPrint("data loaded");
 }
 
 saveData() {
-  print("saving data");
+  debugPrint("saving data");
   List<String> list = [];
   for (vars.Clothing clothing in vars.clothes) {
     list.add(clothing.toJson().toString());
   }
-  print("saved: $list");
+  debugPrint("saved: $list");
   SharedPreferences.getInstance().then((prefs) {
     prefs.setStringList("clothes", list);
-    print("data saved");
+    debugPrint("data saved");
   });
 }
 
@@ -79,7 +80,7 @@ class _MainState extends State<Main> {
           backgroundColor: Theme.of(context).primaryColor,
           title: const Text("Internát - seznam oblečení"),
           elevation: 2,
-          actions: [
+          actions: <Widget>[
             IconButton(
               tooltip: "Nastavení",
               icon: const Icon(Icons.settings),
@@ -98,7 +99,7 @@ class _MainState extends State<Main> {
           child: (vars.clothes.isNotEmpty)
               ? SingleChildScrollView(
                   child: Column(
-                    children: [
+                    children: <Widget>[
                       for (vars.Clothing clothing in vars.clothes)
                         ClothingItem(clothing: clothing),
                       const SizedBox(
@@ -118,7 +119,7 @@ class _MainState extends State<Main> {
             ? Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
+                children: <Widget>[
                   FloatingActionButton(
                     backgroundColor: Theme.of(context).primaryColor,
                     tooltip: "Resetovat počet",
@@ -133,7 +134,7 @@ class _MainState extends State<Main> {
                             title: const Text("Resetovat počet položek?"),
                             content: const Text(
                                 "Opravdu chcete resetovat počet všech položek?"),
-                            actions: [
+                            actions: <Widget>[
                               TextButton(
                                 child: const Text("Zrušit"),
                                 onPressed: () {
