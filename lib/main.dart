@@ -5,6 +5,7 @@ import 'dart:convert';
 import 'package:intr_obleceni/vars.dart' as vars;
 
 main() async {
+  WidgetsFlutterBinding.ensureInitialized();
   await loadData();
   runApp(
     MaterialApp(
