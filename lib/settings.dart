@@ -1,4 +1,6 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:intr_obleceni/vars.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:intr_obleceni/vars.dart' as vars;
@@ -16,12 +18,18 @@ final TextEditingController _controller = TextEditingController();
 
 List<String> modes = ["system", "dark", "light"];
 String mode = modes[0];
+int importMode = 0;
+List? importData;
 
 class _SettingsState extends State<Settings> {
   String? newColor;
 
   @override
   Widget build(BuildContext context) {
+    setstate() {
+      setState(() {});
+    }
+
     return SafeArea(
       child: Scaffold(
         appBar: AppBar(
@@ -413,6 +421,213 @@ class _SettingsState extends State<Settings> {
                           ),
                         );
                       },
+                    ),
+                  ],
+                ),
+                const Divider(
+                  thickness: 2,
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    ElevatedButton(
+                      onPressed: () {
+                        showDialog(
+                          barrierDismissible: false,
+                          context: context,
+                          builder: ((context) {
+                            return StatefulBuilder(
+                              builder: (context, setState) {
+                                return AlertDialog(
+                                  title: const Text("Import dat"),
+                                  content: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: <Widget>[
+                                      const Padding(
+                                        padding: EdgeInsets.all(5),
+                                        child: Text(
+                                          'Vyberte metodu importu dat:',
+                                          style: TextStyle(fontSize: 16),
+                                        ),
+                                      ),
+                                      ListTile(
+                                        onTap: () {
+                                          setState(() {
+                                            importMode = 0;
+                                          });
+                                        },
+                                        title: const Text(
+                                            'Přepsat existující data'),
+                                        leading: Radio(
+                                          activeColor:
+                                              Theme.of(context).primaryColor,
+                                          value: 0,
+                                          groupValue: importMode,
+                                          onChanged: (value) {},
+                                        ),
+                                      ),
+                                      ListTile(
+                                        onTap: () {
+                                          setState(() {
+                                            importMode = 1;
+                                          });
+                                        },
+                                        title: const Text(
+                                            'Přidat data k existujícím'),
+                                        leading: Radio(
+                                          activeColor:
+                                              Theme.of(context).primaryColor,
+                                          value: 1,
+                                          groupValue: importMode,
+                                          onChanged: (value) {},
+                                        ),
+                                      ),
+                                      const Divider(
+                                        thickness: 2,
+                                      ),
+                                      const Text(
+                                        'Vložte data do pole:',
+                                        style: TextStyle(fontSize: 16),
+                                      ),
+                                      const SizedBox(
+                                        height: 10,
+                                      ),
+                                      TextField(
+                                        //TODO: Add red border when invalid (need to check if parsing to Clothing object is possible)
+                                        onChanged: (value) {
+                                          try {
+                                            importData = jsonDecode(value);
+                                          } catch (e) {
+                                            importData = null;
+                                          }
+                                        },
+                                        style: TextStyle(
+                                            fontFamily: 'IBM Plex Mono'),
+                                        keyboardType: TextInputType.multiline,
+                                        maxLines: null,
+                                        decoration: InputDecoration(
+                                          border: OutlineInputBorder(),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  actions: <Widget>[
+                                    TextButton(
+                                      child: const Text("Zrušit"),
+                                      onPressed: () {
+                                        importMode = 0;
+                                        Navigator.pop(context);
+                                      },
+                                    ),
+                                    ElevatedButton(
+                                      onPressed: () {
+                                        if (importMode == 0 &&
+                                            importData != null) {
+                                          vars.clothes = [];
+                                          for (Map clothing in importData!) {
+                                            vars.clothes.add(
+                                                Clothing.fromJson(clothing));
+                                          }
+                                          saveData();
+                                          setstate();
+                                        } else if (importMode == 1) {
+                                          for (Map clothing in importData!) {
+                                            vars.clothes.add(
+                                                Clothing.fromJson(clothing));
+                                          }
+                                          saveData();
+                                          setstate();
+                                        }
+
+                                        importMode = 0;
+                                        Navigator.pop(context);
+                                      },
+                                      child: const Text("Importovat"),
+                                    ),
+                                  ],
+                                );
+                              },
+                            );
+                          }),
+                        );
+                      },
+                      child: Row(
+                        children: const <Widget>[
+                          Icon(Icons.download),
+                          SizedBox(
+                            width: 5,
+                          ),
+                          Text("Importovat data"),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(width: 20),
+                    ElevatedButton(
+                      onPressed: () {
+                        showDialog(
+                          context: context,
+                          builder: ((context) {
+                            List<String> list = [];
+                            for (vars.Clothing clothing in vars.clothes) {
+                              String json = clothing.toJson().toString();
+                              list.add(json);
+                            }
+                            return AlertDialog(
+                              title: const Text("Export dat"),
+                              content: GlowingOverscrollIndicator(
+                                axisDirection: AxisDirection.down,
+                                color: Theme.of(context).primaryColor,
+                                child: SingleChildScrollView(
+                                  child: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      const Text(
+                                        "Níže jsou vyexportované data. Můžete si je zkopírovat.",
+                                        style: TextStyle(fontSize: 20),
+                                      ),
+                                      const Divider(
+                                        thickness: 2,
+                                      ),
+                                      SelectableText(
+                                        list.toString(),
+                                        style: const TextStyle(
+                                          fontFamily: 'IBM Plex Mono',
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                              actions: <Widget>[
+                                TextButton(
+                                  child: const Text("Zkopírovat"),
+                                  onPressed: () {
+                                    Clipboard.setData(
+                                      ClipboardData(text: list.toString()),
+                                    );
+                                    Navigator.pop(context);
+                                  },
+                                ),
+                                TextButton(
+                                  child: const Text("OK"),
+                                  onPressed: () {
+                                    Navigator.pop(context);
+                                  },
+                                ),
+                              ],
+                            );
+                          }),
+                        );
+                      },
+                      child: Row(
+                        children: const <Widget>[
+                          Icon(Icons.upload),
+                          SizedBox(
+                            width: 5,
+                          ),
+                          Text("Exportovat data"),
+                        ],
+                      ),
                     ),
                   ],
                 ),
