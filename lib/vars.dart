@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 String? addedClothing;
 String? newName;
 List<Clothing> clothes = [];
-String version = "1.4.0";
+String version = "1.5.0-DEV";
 String? hexColor;
 String theme = "system";
 
@@ -51,7 +51,9 @@ class Clothing {
 
   Clothing.fromJson(Map json) {
     name = json["name"];
-    count = json["count"];
+    count = json["count"].runtimeType == int
+        ? json["count"]
+        : int.parse(json["count"]);
     lastChangedDateTime = json["lastChangedDateTime"] != null
         ? DateTime.parse(json["lastChangedDateTime"])
         : null;

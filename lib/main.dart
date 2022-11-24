@@ -51,7 +51,7 @@ loadData() async {
   final SharedPreferences prefs = await SharedPreferences.getInstance();
   list = prefs.getStringList("clothes") ?? [];
   for (String item in list) {
-    print(item);
+    debugPrint(item);
     vars.clothes.add(vars.Clothing.fromJson(jsonDecode(item)));
   }
   vars.hexColor = prefs.getString("color") ?? "2196f3";
@@ -64,9 +64,10 @@ saveData() {
   debugPrint("saving data");
   List<String> list = [];
   for (vars.Clothing clothing in vars.clothes) {
-    list.add(clothing.toJson().toString());
+    String json = clothing.toJson().toString();
+    list.add(json);
+    debugPrint(json);
   }
-  debugPrint("saved: $list");
   SharedPreferences.getInstance().then((prefs) {
     prefs.setStringList("clothes", list);
     debugPrint("data saved");
@@ -96,15 +97,24 @@ class _MainState extends State<Main> {
           ],
         ),
         body: (vars.clothes.isNotEmpty)
-            ? SingleChildScrollView(
-                child: Column(
-                  children: <Widget>[
-                    for (vars.Clothing clothing in vars.clothes)
-                      ClothingItem(clothing: clothing),
-                    const SizedBox(
-                      height: 70,
+            ? Scrollbar(
+                controller: ScrollController(),
+                radius: const Radius.circular(10),
+                thickness: 7,
+                child: GlowingOverscrollIndicator(
+                  color: Theme.of(context).primaryColor,
+                  axisDirection: AxisDirection.down,
+                  child: SingleChildScrollView(
+                    child: Column(
+                      children: <Widget>[
+                        for (vars.Clothing clothing in vars.clothes)
+                          ClothingItem(clothing: clothing),
+                        const SizedBox(
+                          height: 70,
+                        ),
+                      ],
                     ),
-                  ],
+                  ),
                 ),
               )
             : const Center(
