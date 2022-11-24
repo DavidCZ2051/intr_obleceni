@@ -46,11 +46,12 @@ ThemeMode getThemeMode() {
 }
 
 loadData() async {
-  debugPrint("loading  data");
+  debugPrint("loading data");
   List<String> list = [];
   final SharedPreferences prefs = await SharedPreferences.getInstance();
   list = prefs.getStringList("clothes") ?? [];
   for (String item in list) {
+    print(item);
     vars.clothes.add(vars.Clothing.fromJson(jsonDecode(item)));
   }
   vars.hexColor = prefs.getString("color") ?? "2196f3";
@@ -94,28 +95,24 @@ class _MainState extends State<Main> {
             ),
           ],
         ),
-        body: Scrollbar(
-          radius: const Radius.circular(10),
-          thickness: 7,
-          child: (vars.clothes.isNotEmpty)
-              ? SingleChildScrollView(
-                  child: Column(
-                    children: <Widget>[
-                      for (vars.Clothing clothing in vars.clothes)
-                        ClothingItem(clothing: clothing),
-                      const SizedBox(
-                        height: 70,
-                      ),
-                    ],
-                  ),
-                )
-              : const Center(
-                  child: Text(
-                    "Zatím žádná položka",
-                    style: TextStyle(fontSize: 25),
-                  ),
+        body: (vars.clothes.isNotEmpty)
+            ? SingleChildScrollView(
+                child: Column(
+                  children: <Widget>[
+                    for (vars.Clothing clothing in vars.clothes)
+                      ClothingItem(clothing: clothing),
+                    const SizedBox(
+                      height: 70,
+                    ),
+                  ],
                 ),
-        ),
+              )
+            : const Center(
+                child: Text(
+                  "Zatím žádná položka",
+                  style: TextStyle(fontSize: 25),
+                ),
+              ),
         floatingActionButton: (vars.clothes.isNotEmpty)
             ? Row(
                 mainAxisAlignment: MainAxisAlignment.end,
@@ -198,31 +195,41 @@ class _ClothingItemState extends State<ClothingItem> {
         children: <Widget>[
           Expanded(
             flex: 10,
-            child: RichText(
-              text: TextSpan(
-                children: <TextSpan>[
-                  TextSpan(
-                    text: "${widget.clothing.count}x ",
-                    style: TextStyle(
-                      color: Theme.of(context).primaryColor,
-                      fontSize: 30,
-                      fontWeight: FontWeight.bold,
-                    ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                RichText(
+                  text: TextSpan(
+                    children: <TextSpan>[
+                      TextSpan(
+                        text: "${widget.clothing.count}x ",
+                        style: TextStyle(
+                          color: Theme.of(context).primaryColor,
+                          fontSize: 30,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      TextSpan(
+                        text: widget.clothing.name,
+                        style: TextStyle(
+                          color:
+                              (Theme.of(context).brightness == Brightness.dark)
+                                  ? Colors.white
+                                  : Colors.black,
+                          fontSize: 30,
+                        ),
+                      ),
+                    ],
                   ),
-                  TextSpan(
-                    text: widget.clothing.name,
-                    style: TextStyle(
-                      color: (Theme.of(context).brightness == Brightness.dark)
-                          ? Colors.white
-                          : Colors.black,
-                      fontSize: 30,
-                    ),
-                  ),
-                ],
-              ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(3),
+                  child: Text(
+                      "Poslední změna: ${widget.clothing.lastChangedString}"),
+                ),
+              ],
             ),
           ),
-          const Spacer(),
           IconButton(
             tooltip: "Resetovat počet",
             onPressed: () {

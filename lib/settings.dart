@@ -108,6 +108,7 @@ class _SettingsState extends State<Settings> {
                                     vars.Clothing(
                                       name: vars.addedClothing!.trim(),
                                       count: 0,
+                                      lastChangedDateTime: DateTime.now(),
                                     ),
                                   );
                                   saveData();
@@ -167,8 +168,8 @@ class _SettingsState extends State<Settings> {
                                   child: const Text("Zrušit"),
                                   onPressed: () => Navigator.pop(context),
                                 ),
-                                TextButton(
-                                  child: const Text("OK"),
+                                ElevatedButton(
+                                  child: const Text("Uložit"),
                                   onPressed: () {
                                     if (vars.newName != null) {
                                       if (vars.newName!.contains("\"") ||

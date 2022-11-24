@@ -33,17 +33,35 @@ MaterialColor materialColorMaker(String hex) {
 }
 
 class Clothing {
-  Clothing({required this.name, required this.count});
+  Clothing({
+    required this.name,
+    required this.count,
+    required this.lastChangedDateTime,
+  });
   String? name;
   int? count;
+  DateTime? lastChangedDateTime;
 
   Map toJson() => {
         '"name"': '"$name"',
-        '"count"': '"$count"',
+        '"count"': count,
+        '"lastChangedDateTime"':
+            lastChangedDateTime == null ? null : '"$lastChangedDateTime"',
       };
 
   Clothing.fromJson(Map json) {
     name = json["name"];
-    count = int.parse(json["count"]);
+    count = json["count"];
+    lastChangedDateTime = json["lastChangedDateTime"] != null
+        ? DateTime.parse(json["lastChangedDateTime"])
+        : null;
+  }
+
+  String get lastChangedString {
+    // dd.mm.yyyy
+    if (lastChangedDateTime == null) {
+      return "Neznámé";
+    }
+    return "${lastChangedDateTime!.day}.${lastChangedDateTime!.month}.${lastChangedDateTime!.year}";
   }
 }
