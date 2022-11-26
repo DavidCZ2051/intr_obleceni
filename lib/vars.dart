@@ -38,8 +38,8 @@ class Clothing {
     required this.count,
     required this.lastChangedDateTime,
   });
-  String? name;
-  int? count;
+  late String name;
+  late int count;
   DateTime? lastChangedDateTime;
 
   Map toJson() => {

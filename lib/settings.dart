@@ -157,7 +157,7 @@ class _SettingsState extends State<Settings> {
                         Expanded(
                           flex: 10,
                           child: Text(
-                            clothing.name!,
+                            clothing.name,
                             style: const TextStyle(fontSize: 25),
                           ),
                         ),
@@ -495,18 +495,23 @@ class _SettingsState extends State<Settings> {
                                       TextField(
                                         //TODO: Add red border when invalid (need to check if parsing to Clothing object is possible)
                                         onChanged: (value) {
-                                          try {
-                                            importData = jsonDecode(value);
-                                          } catch (e) {
+                                          var object = areDataValid(value);
+                                          if (object != null) {
+                                            importData = object;
+                                          } else {
                                             importData = null;
                                           }
+                                          setState(() {});
                                         },
-                                        style: TextStyle(
+                                        style: const TextStyle(
                                             fontFamily: 'IBM Plex Mono'),
                                         keyboardType: TextInputType.multiline,
                                         maxLines: null,
                                         decoration: InputDecoration(
                                           border: OutlineInputBorder(),
+                                          errorText: importData == null
+                                              ? 'Neplatná data'
+                                              : null,
                                         ),
                                       ),
                                     ],
@@ -516,6 +521,7 @@ class _SettingsState extends State<Settings> {
                                       child: const Text("Zrušit"),
                                       onPressed: () {
                                         importMode = 0;
+                                        validData = false;
                                         Navigator.pop(context);
                                       },
                                     ),
@@ -523,14 +529,11 @@ class _SettingsState extends State<Settings> {
                                       onPressed: () {
                                         if (importMode == 0 &&
                                             importData != null) {
-                                          vars.clothes = [];
-                                          for (Map clothing in importData!) {
-                                            vars.clothes.add(
-                                                Clothing.fromJson(clothing));
-                                          }
                                           saveData();
                                           setstate();
-                                        } else if (importMode == 1) {
+                                          setState(() {});
+                                        } else if (importMode == 1 &&
+                                            importData != null) {
                                           for (Map clothing in importData!) {
                                             vars.clothes.add(
                                                 Clothing.fromJson(clothing));
@@ -540,6 +543,7 @@ class _SettingsState extends State<Settings> {
                                         }
 
                                         importMode = 0;
+                                        validData = false;
                                         Navigator.pop(context);
                                       },
                                       child: const Text("Importovat"),
@@ -594,6 +598,7 @@ class _SettingsState extends State<Settings> {
                                           fontFamily: 'IBM Plex Mono',
                                         ),
                                       ),
+                                      //TODO: idk but importing data without time doesnt set it to null idk
                                     ],
                                   ),
                                 ),
@@ -676,4 +681,19 @@ saveData() {
     prefs.setString("color", vars.hexColor!);
     prefs.setString("theme", vars.theme);
   });
+}
+
+areDataValid(String data) {
+  print("checking: $data");
+  try {
+    List clothes = [];
+    for (Map clothing in jsonDecode(data)) {
+      clothes.add(Clothing.fromJson(clothing));
+    }
+    print('valid');
+    return clothes;
+  } catch (e) {
+    print('invalid');
+    return null;
+  }
 }
