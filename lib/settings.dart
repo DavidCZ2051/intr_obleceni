@@ -6,6 +6,8 @@ import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:intr_obleceni/vars.dart' as vars;
 import 'package:flutter/services.dart';
 import 'dart:io';
+import 'package:intr_obleceni/main.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class Settings extends StatefulWidget {
   const Settings({Key? key}) : super(key: key);
@@ -19,10 +21,99 @@ final TextEditingController _controller = TextEditingController();
 List<String> modes = ["system", "dark", "light"];
 String mode = modes[0];
 int importMode = 0;
-List? importData;
+List<vars.Clothing>? importData;
 
 class _SettingsState extends State<Settings> {
   String? newColor;
+
+  handleCheckingVersion() async {
+    var object = await checkVersion(vars.version);
+    if (object.statusCode == 200) {
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text("Dostupná aktualizace!"),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              RichText(
+                text: TextSpan(
+                  style: TextStyle(
+                    color: Theme.of(context).brightness == Brightness.dark
+                        ? Colors.white
+                        : Colors.black,
+                  ),
+                  children: const [
+                    TextSpan(
+                      text: "Aktuální verze: ",
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                    TextSpan(text: vars.version),
+                  ],
+                ),
+              ),
+              RichText(
+                text: TextSpan(
+                  children: [
+                    const TextSpan(
+                      text: "Nová verze: ",
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: Colors.green,
+                      ),
+                    ),
+                    TextSpan(
+                      text: object.body!["latestVersion"] + "\n",
+                      style: TextStyle(
+                        color: Theme.of(context).brightness == Brightness.dark
+                            ? Colors.white
+                            : Colors.black,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          actions: <Widget>[
+            if (object.body!["downloadUrl"] != null)
+              ElevatedButton(
+                onPressed: () {
+                  launchUrl(
+                    Uri.parse(object.body!["downloadUrl"]),
+                    mode: LaunchMode.externalApplication,
+                  );
+                },
+                child: const Text("Stáhnout novou verzi"),
+              ),
+            TextButton(
+              child: const Text("OK"),
+              onPressed: () {
+                Navigator.pop(context);
+              },
+            ),
+          ],
+        ),
+      );
+    } else if (object.statusCode == 204) {
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text("Aplikace je aktuální!"),
+          content: const Text("Žádná nová verze není k dispozici."),
+          actions: <Widget>[
+            TextButton(
+              child: const Text("OK"),
+              onPressed: () {
+                Navigator.pop(context);
+              },
+            ),
+          ],
+        ),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -223,9 +314,14 @@ class _SettingsState extends State<Settings> {
                   thickness: 2,
                 ),
                 Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: <Widget>[
-                    ElevatedButton(
+                    ElevatedButton.icon(
+                      icon: Icon(
+                        (Theme.of(context).brightness == Brightness.dark)
+                            ? Icons.light_mode
+                            : Icons.dark_mode,
+                      ),
                       onPressed: () {
                         showDialog(
                           context: context,
@@ -343,28 +439,11 @@ class _SettingsState extends State<Settings> {
                           ),
                         );
                       },
-                      child: Row(
-                        children: <Widget>[
-                          Icon((Theme.of(context).brightness == Brightness.dark)
-                              ? Icons.light_mode
-                              : Icons.dark_mode),
-                          const SizedBox(width: 5),
-                          const Text("Změnit mód"),
-                        ],
-                      ),
+                      label: const Text("Změnit mód"),
                     ),
-                    const SizedBox(width: 20),
-                    ElevatedButton(
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: const <Widget>[
-                          Icon(Icons.color_lens),
-                          SizedBox(
-                            width: 5,
-                          ),
-                          Text("Změnit barvu"),
-                        ],
-                      ),
+                    ElevatedButton.icon(
+                      icon: const Icon(Icons.color_lens),
+                      label: const Text("Změnit barvu"),
                       onPressed: () {
                         showDialog(
                           context: context,
@@ -428,9 +507,10 @@ class _SettingsState extends State<Settings> {
                   thickness: 2,
                 ),
                 Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: <Widget>[
-                    ElevatedButton(
+                    ElevatedButton.icon(
+                      icon: const Icon(Icons.download),
                       onPressed: () {
                         showDialog(
                           barrierDismissible: false,
@@ -440,88 +520,97 @@ class _SettingsState extends State<Settings> {
                               builder: (context, setState) {
                                 return AlertDialog(
                                   title: const Text("Import dat"),
-                                  content: Column(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: <Widget>[
-                                      const Padding(
-                                        padding: EdgeInsets.all(5),
-                                        child: Text(
-                                          'Vyberte metodu importu dat:',
+                                  content: SingleChildScrollView(
+                                    child: Column(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: <Widget>[
+                                        const Padding(
+                                          padding: EdgeInsets.all(5),
+                                          child: Text(
+                                            'Vyberte metodu importu dat:',
+                                            style: TextStyle(fontSize: 16),
+                                          ),
+                                        ),
+                                        ListTile(
+                                          onTap: () {
+                                            setState(() {
+                                              importMode = 0;
+                                            });
+                                          },
+                                          title: const Text(
+                                              'Přepsat existující data'),
+                                          leading: Radio(
+                                            activeColor:
+                                                Theme.of(context).primaryColor,
+                                            value: 0,
+                                            groupValue: importMode,
+                                            onChanged: (value) {
+                                              setState(() {
+                                                importMode = value as int;
+                                              });
+                                            },
+                                          ),
+                                        ),
+                                        ListTile(
+                                          onTap: () {
+                                            setState(() {
+                                              importMode = 1;
+                                            });
+                                          },
+                                          title: const Text(
+                                              'Přidat data k existujícím'),
+                                          leading: Radio(
+                                            activeColor:
+                                                Theme.of(context).primaryColor,
+                                            value: 1,
+                                            groupValue: importMode,
+                                            onChanged: (value) {
+                                              setState(() {
+                                                importMode = value as int;
+                                              });
+                                            },
+                                          ),
+                                        ),
+                                        const Divider(
+                                          thickness: 2,
+                                        ),
+                                        const Text(
+                                          'Vložte data do pole:',
                                           style: TextStyle(fontSize: 16),
                                         ),
-                                      ),
-                                      ListTile(
-                                        onTap: () {
-                                          setState(() {
-                                            importMode = 0;
-                                          });
-                                        },
-                                        title: const Text(
-                                            'Přepsat existující data'),
-                                        leading: Radio(
-                                          activeColor:
-                                              Theme.of(context).primaryColor,
-                                          value: 0,
-                                          groupValue: importMode,
-                                          onChanged: (value) {},
+                                        const SizedBox(
+                                          height: 10,
                                         ),
-                                      ),
-                                      ListTile(
-                                        onTap: () {
-                                          setState(() {
-                                            importMode = 1;
-                                          });
-                                        },
-                                        title: const Text(
-                                            'Přidat data k existujícím'),
-                                        leading: Radio(
-                                          activeColor:
-                                              Theme.of(context).primaryColor,
-                                          value: 1,
-                                          groupValue: importMode,
-                                          onChanged: (value) {},
+                                        TextField(
+                                          onChanged: (value) {
+                                            var object = areDataValid(value);
+                                            if (object != null) {
+                                              importData = object;
+                                            } else {
+                                              importData = null;
+                                            }
+                                            setState(() {});
+                                          },
+                                          style: const TextStyle(
+                                              fontFamily: 'IBM Plex Mono'),
+                                          keyboardType: TextInputType.multiline,
+                                          maxLines: null,
+                                          decoration: InputDecoration(
+                                            border: const OutlineInputBorder(),
+                                            errorText: importData == null
+                                                ? 'Neplatná data'
+                                                : null,
+                                          ),
                                         ),
-                                      ),
-                                      const Divider(
-                                        thickness: 2,
-                                      ),
-                                      const Text(
-                                        'Vložte data do pole:',
-                                        style: TextStyle(fontSize: 16),
-                                      ),
-                                      const SizedBox(
-                                        height: 10,
-                                      ),
-                                      TextField(
-                                        //TODO: Add red border when invalid (need to check if parsing to Clothing object is possible)
-                                        onChanged: (value) {
-                                          var object = areDataValid(value);
-                                          if (object != null) {
-                                            importData = object;
-                                          } else {
-                                            importData = null;
-                                          }
-                                          setState(() {});
-                                        },
-                                        style: const TextStyle(
-                                            fontFamily: 'IBM Plex Mono'),
-                                        keyboardType: TextInputType.multiline,
-                                        maxLines: null,
-                                        decoration: InputDecoration(
-                                          border: OutlineInputBorder(),
-                                          errorText: importData == null
-                                              ? 'Neplatná data'
-                                              : null,
-                                        ),
-                                      ),
-                                    ],
+                                      ],
+                                    ),
                                   ),
                                   actions: <Widget>[
                                     TextButton(
                                       child: const Text("Zrušit"),
                                       onPressed: () {
                                         importMode = 0;
-                                        validData = false;
+
                                         Navigator.pop(context);
                                       },
                                     ),
@@ -529,21 +618,20 @@ class _SettingsState extends State<Settings> {
                                       onPressed: () {
                                         if (importMode == 0 &&
                                             importData != null) {
+                                          vars.clothes = importData!;
                                           saveData();
                                           setstate();
                                           setState(() {});
                                         } else if (importMode == 1 &&
                                             importData != null) {
-                                          for (Map clothing in importData!) {
-                                            vars.clothes.add(
-                                                Clothing.fromJson(clothing));
+                                          for (vars.Clothing clothing
+                                              in importData!) {
+                                            vars.clothes.add(clothing);
                                           }
                                           saveData();
                                           setstate();
                                         }
-
                                         importMode = 0;
-                                        validData = false;
                                         Navigator.pop(context);
                                       },
                                       child: const Text("Importovat"),
@@ -551,22 +639,14 @@ class _SettingsState extends State<Settings> {
                                   ],
                                 );
                               },
-                            );
+                            ); //TODO: change the lastchanged time when changing stuff
                           }),
                         );
                       },
-                      child: Row(
-                        children: const <Widget>[
-                          Icon(Icons.download),
-                          SizedBox(
-                            width: 5,
-                          ),
-                          Text("Importovat data"),
-                        ],
-                      ),
+                      label: const Text("Importovat data"),
                     ),
-                    const SizedBox(width: 20),
-                    ElevatedButton(
+                    ElevatedButton.icon(
+                      icon: const Icon(Icons.upload),
                       onPressed: () {
                         showDialog(
                           context: context,
@@ -598,7 +678,6 @@ class _SettingsState extends State<Settings> {
                                           fontFamily: 'IBM Plex Mono',
                                         ),
                                       ),
-                                      //TODO: idk but importing data without time doesnt set it to null idk
                                     ],
                                   ),
                                 ),
@@ -624,14 +703,34 @@ class _SettingsState extends State<Settings> {
                           }),
                         );
                       },
-                      child: Row(
-                        children: const <Widget>[
-                          Icon(Icons.upload),
-                          SizedBox(
-                            width: 5,
-                          ),
-                          Text("Exportovat data"),
-                        ],
+                      label: const Text("Exportovat data"),
+                    ),
+                  ],
+                ),
+                const Divider(
+                  thickness: 2,
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: <Widget>[
+                    ElevatedButton.icon(
+                      icon: const Icon(Icons.update),
+                      label: const Text('Zkontrolovat aktualizace'),
+                      onPressed: () {
+                        handleCheckingVersion();
+                      },
+                    ),
+                    InkWell(
+                      onTap: () {
+                        setState(() {
+                          vars.checkForUpdates = !vars.checkForUpdates!;
+                        });
+                        saveData();
+                      },
+                      child: Chip(
+                        backgroundColor:
+                            vars.checkForUpdates! ? Colors.green : Colors.red,
+                        label: const Text('Kontrolovat aktualizace'),
                       ),
                     ),
                   ],
@@ -641,21 +740,21 @@ class _SettingsState extends State<Settings> {
                 ),
                 Center(
                   child: Column(
-                    children: <Widget>[
-                      const SizedBox(
+                    children: const <Widget>[
+                      SizedBox(
                         height: 10,
                       ),
                       Text(
                         "Verze: ${vars.version}",
-                        style: const TextStyle(fontSize: 20),
+                        style: TextStyle(fontSize: 20),
                       ),
-                      const Padding(
+                      Padding(
                         padding: EdgeInsets.all(8.0),
                         child: FlutterLogo(
                           size: 70,
                         ),
                       ),
-                      const Text(
+                      Text(
                         "Made by David Vobruba using Flutter",
                         style: TextStyle(fontSize: 15),
                       ),
@@ -680,20 +779,21 @@ saveData() {
     prefs.setStringList("clothes", list);
     prefs.setString("color", vars.hexColor!);
     prefs.setString("theme", vars.theme);
+    prefs.setBool("checkForUpdates", vars.checkForUpdates!);
   });
 }
 
 areDataValid(String data) {
-  print("checking: $data");
+  debugPrint("checking: $data");
   try {
-    List clothes = [];
+    List<vars.Clothing> clothes = [];
     for (Map clothing in jsonDecode(data)) {
       clothes.add(Clothing.fromJson(clothing));
     }
-    print('valid');
+    debugPrint('valid');
     return clothes;
   } catch (e) {
-    print('invalid');
+    debugPrint('invalid');
     return null;
   }
 }

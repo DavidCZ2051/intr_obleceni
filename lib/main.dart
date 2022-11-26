@@ -3,6 +3,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:intr_obleceni/settings.dart';
 import 'dart:convert';
 import 'package:intr_obleceni/vars.dart' as vars;
+import 'package:http/http.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -57,6 +59,7 @@ loadData() async {
   vars.hexColor = prefs.getString("color") ?? "2196f3";
   vars.theme = prefs.getString("theme") ?? "system";
   mode = vars.theme;
+  vars.checkForUpdates = prefs.getBool("checkForUpdates") ?? false;
   debugPrint("data loaded");
 }
 
@@ -75,6 +78,87 @@ saveData() {
 }
 
 class _MainState extends State<Main> {
+  @override
+  void initState() {
+    super.initState();
+    if (vars.checkForUpdates!) {
+      handleCheckingVersion();
+    }
+  }
+
+  handleCheckingVersion() async {
+    var object = await checkVersion(vars.version);
+    if (object.statusCode == 200) {
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text("Dostupná aktualizace!"),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              RichText(
+                text: TextSpan(
+                  style: TextStyle(
+                    color: Theme.of(context).brightness == Brightness.dark
+                        ? Colors.white
+                        : Colors.black,
+                  ),
+                  children: const [
+                    TextSpan(
+                      text: "Aktuální verze: ",
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                    TextSpan(text: vars.version),
+                  ],
+                ),
+              ),
+              RichText(
+                text: TextSpan(
+                  children: [
+                    const TextSpan(
+                      text: "Nová verze: ",
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: Colors.green,
+                      ),
+                    ),
+                    TextSpan(
+                      text: object.body!["latestVersion"] + "\n",
+                      style: TextStyle(
+                        color: Theme.of(context).brightness == Brightness.dark
+                            ? Colors.white
+                            : Colors.black,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          actions: <Widget>[
+            if (object.body!["downloadUrl"] != null)
+              ElevatedButton(
+                onPressed: () {
+                  launchUrl(
+                    Uri.parse(object.body!["downloadUrl"]),
+                    mode: LaunchMode.externalApplication,
+                  );
+                },
+                child: const Text("Stáhnout novou verzi"),
+              ),
+            TextButton(
+              child: const Text("OK"),
+              onPressed: () {
+                Navigator.pop(context);
+              },
+            ),
+          ],
+        ),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -285,6 +369,26 @@ class _ClothingItemState extends State<ClothingItem> {
           ),
         ],
       ),
+    );
+  }
+}
+
+Future<vars.FunctionObject> checkVersion(String currentVersion) async {
+  Response response = await get(
+    Uri.parse("https://Version-Checker-API.davidcz2051.repl.co/intr_obleceni"),
+    headers: {
+      "version": currentVersion,
+    },
+  );
+
+  if (response.statusCode == 204) {
+    debugPrint('Version is up to date!');
+    return vars.FunctionObject(statusCode: 204);
+  } else {
+    debugPrint('Version is outdated!');
+    return vars.FunctionObject(
+      statusCode: response.statusCode,
+      body: jsonDecode(response.body),
     );
   }
 }

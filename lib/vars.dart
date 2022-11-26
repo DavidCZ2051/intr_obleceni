@@ -3,9 +3,16 @@ import 'package:flutter/material.dart';
 String? addedClothing;
 String? newName;
 List<Clothing> clothes = [];
-String version = "1.5.0-DEV";
+const String version = "1.5.0-DEV";
 String? hexColor;
 String theme = "system";
+bool? checkForUpdates = true;
+
+class FunctionObject {
+  int statusCode;
+  Map? body;
+  FunctionObject({required this.statusCode, this.body});
+}
 
 String colorToHex(Color color) {
   return color.value.toRadixString(16).substring(2, 8);
