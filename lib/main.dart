@@ -328,6 +328,7 @@ class _ClothingItemState extends State<ClothingItem> {
             tooltip: "Resetovat počet",
             onPressed: () {
               widget.clothing.count = 0;
+              widget.clothing.lastChangedDateTime = DateTime.now();
               setState(() {});
               saveData();
             },
@@ -342,6 +343,7 @@ class _ClothingItemState extends State<ClothingItem> {
                 onChanged: (value) {
                   try {
                     widget.clothing.count = int.parse(value);
+                    widget.clothing.lastChangedDateTime = DateTime.now();
                   } catch (e) {
                     return;
                   }

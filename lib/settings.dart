@@ -639,7 +639,7 @@ class _SettingsState extends State<Settings> {
                                   ],
                                 );
                               },
-                            ); //TODO: change the lastchanged time when changing stuff
+                            );
                           }),
                         );
                       },
