@@ -59,7 +59,7 @@ loadData() async {
   vars.hexColor = prefs.getString("color") ?? "2196f3";
   vars.theme = prefs.getString("theme") ?? "system";
   mode = vars.theme;
-  vars.checkForUpdates = prefs.getBool("checkForUpdates") ?? false;
+  vars.checkForUpdates = prefs.getBool("checkForUpdates") ?? true;
   debugPrint("data loaded");
 }
 

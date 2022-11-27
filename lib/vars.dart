@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 String? addedClothing;
 String? newName;
 List<Clothing> clothes = [];
-const String version = "1.5.0-DEV";
+const String version = "1.5.0";
 String? hexColor;
 String theme = "system";
 bool? checkForUpdates = true;
