@@ -238,6 +238,8 @@ class _MainState extends State<Main> {
                                 onPressed: () {
                                   for (vars.Clothing clothing in vars.clothes) {
                                     clothing.count = 0;
+                                    clothing.lastChangedDateTime =
+                                        DateTime.now();
                                   }
                                   saveData();
                                   setState(() {});
