@@ -25,9 +25,16 @@ List<vars.Clothing>? importData;
 
 class _SettingsState extends State<Settings> {
   String? newColor;
+  bool isLoading = false;
 
   handleCheckingVersion() async {
+    setState(() {
+      isLoading = true;
+    });
     var object = await checkVersion(vars.version);
+    setState(() {
+      isLoading = false;
+    });
     if (object.statusCode == 200) {
       showDialog(
         context: context,
@@ -713,13 +720,15 @@ class _SettingsState extends State<Settings> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: <Widget>[
-                    ElevatedButton.icon(
-                      icon: const Icon(Icons.update),
-                      label: const Text('Zkontrolovat aktualizace'),
-                      onPressed: () {
-                        handleCheckingVersion();
-                      },
-                    ),
+                    isLoading
+                        ? const CircularProgressIndicator()
+                        : ElevatedButton.icon(
+                            icon: const Icon(Icons.update),
+                            label: const Text('Zkontrolovat aktualizace'),
+                            onPressed: () {
+                              handleCheckingVersion();
+                            },
+                          ),
                     InkWell(
                       onTap: () {
                         setState(() {

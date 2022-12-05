@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 
+const String version = "1.5.0-DEV";
 String? addedClothing;
 String? newName;
 List<Clothing> clothes = [];
-const String version = "1.5.0";
 String? hexColor;
 String theme = "system";
 bool? checkForUpdates = true;
