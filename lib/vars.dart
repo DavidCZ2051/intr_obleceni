@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-const String version = "1.5.1-DEV";
+const String version = "1.5.1";
 String? addedClothing;
 String? newName;
 List<Clothing> clothes = [];
