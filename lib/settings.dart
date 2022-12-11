@@ -119,6 +119,23 @@ class _SettingsState extends State<Settings> {
           ],
         ),
       );
+    } else {
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: Text("Chyba ${object.statusCode}"),
+          content:
+              const Text("Chyba při zjišťování verze. Kontaktujte vývojáře."),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              child: const Text("OK"),
+            ),
+          ],
+        ),
+      );
     }
   }
 
