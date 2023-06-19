@@ -17,14 +17,18 @@ main() async {
       themeMode: getThemeMode(),
       color: vars.materialColorMaker(vars.hexColor!),
       theme: ThemeData(
-        primarySwatch: vars.materialColorMaker(vars.hexColor!),
-        primaryColor: vars.materialColorMaker(vars.hexColor!),
-        brightness: Brightness.light,
+        useMaterial3: true,
+        colorScheme: ColorScheme.fromSeed(
+          brightness: Brightness.light,
+          seedColor: vars.materialColorMaker(vars.hexColor!),
+        ),
       ),
       darkTheme: ThemeData(
-        primarySwatch: vars.materialColorMaker(vars.hexColor!),
-        primaryColor: vars.materialColorMaker(vars.hexColor!),
-        brightness: Brightness.dark,
+        useMaterial3: true,
+        colorScheme: ColorScheme.fromSeed(
+          brightness: Brightness.dark,
+          seedColor: vars.materialColorMaker(vars.hexColor!),
+        ),
       ),
     ),
   );
@@ -96,7 +100,7 @@ class _MainState extends State<Main> {
           content: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
+            children: <Widget>[
               RichText(
                 text: TextSpan(
                   style: TextStyle(
@@ -115,7 +119,7 @@ class _MainState extends State<Main> {
               ),
               RichText(
                 text: TextSpan(
-                  children: [
+                  children: <TextSpan>[
                     const TextSpan(
                       text: "Nová verze: ",
                       style: TextStyle(
@@ -138,7 +142,7 @@ class _MainState extends State<Main> {
           ),
           actions: <Widget>[
             if (object.body!["downloadUrl"] != null)
-              ElevatedButton(
+              OutlinedButton(
                 onPressed: () {
                   launchUrl(
                     Uri.parse(object.body!["downloadUrl"]),
@@ -165,12 +169,15 @@ class _MainState extends State<Main> {
       child: Scaffold(
         appBar: AppBar(
           backgroundColor: Theme.of(context).primaryColor,
-          title: const Text("Internát - seznam oblečení"),
+          title: const Text(
+            "Internát - seznam oblečení",
+            style: TextStyle(color: Colors.white),
+          ),
           elevation: 2,
           actions: <Widget>[
             IconButton(
               tooltip: "Nastavení",
-              icon: const Icon(Icons.settings),
+              icon: const Icon(Icons.settings, color: Colors.white),
               onPressed: () {
                 Navigator.push(
                   context,
@@ -185,19 +192,15 @@ class _MainState extends State<Main> {
                 controller: ScrollController(),
                 radius: const Radius.circular(10),
                 thickness: 7,
-                child: GlowingOverscrollIndicator(
-                  color: Theme.of(context).primaryColor,
-                  axisDirection: AxisDirection.down,
-                  child: SingleChildScrollView(
-                    child: Column(
-                      children: <Widget>[
-                        for (vars.Clothing clothing in vars.clothes)
-                          ClothingItem(clothing: clothing),
-                        const SizedBox(
-                          height: 70,
-                        ),
-                      ],
-                    ),
+                child: SingleChildScrollView(
+                  child: Column(
+                    children: <Widget>[
+                      for (vars.Clothing clothing in vars.clothes)
+                        ClothingItem(clothing: clothing),
+                      const SizedBox(
+                        height: 70,
+                      ),
+                    ],
                   ),
                 ),
               )
@@ -213,7 +216,6 @@ class _MainState extends State<Main> {
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: <Widget>[
                   FloatingActionButton(
-                    backgroundColor: Theme.of(context).primaryColor,
                     tooltip: "Resetovat počet",
                     heroTag: "btn1",
                     child: const Icon(Icons.restore),
@@ -233,7 +235,7 @@ class _MainState extends State<Main> {
                                   Navigator.pop(context);
                                 },
                               ),
-                              ElevatedButton(
+                              OutlinedButton(
                                 child: const Text("Ano"),
                                 onPressed: () {
                                   for (vars.Clothing clothing in vars.clothes) {
@@ -258,7 +260,6 @@ class _MainState extends State<Main> {
                   FloatingActionButton(
                     tooltip: "Uložit",
                     heroTag: "btn2",
-                    backgroundColor: Colors.green,
                     child: const Icon(Icons.done),
                     onPressed: () {
                       saveData();
@@ -293,14 +294,16 @@ class _ClothingItemState extends State<ClothingItem> {
             flex: 10,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
+              children: <Widget>[
                 RichText(
                   text: TextSpan(
                     children: <TextSpan>[
                       TextSpan(
                         text: "${widget.clothing.count}x ",
                         style: TextStyle(
-                          color: Theme.of(context).primaryColor,
+                          color: Theme.of(context).brightness == Brightness.dark
+                              ? Theme.of(context).primaryColorLight
+                              : Theme.of(context).primaryColor,
                           fontSize: 30,
                           fontWeight: FontWeight.bold,
                         ),

@@ -43,7 +43,7 @@ class _SettingsState extends State<Settings> {
           content: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
+            children: <Widget>[
               RichText(
                 text: TextSpan(
                   style: TextStyle(
@@ -62,7 +62,7 @@ class _SettingsState extends State<Settings> {
               ),
               RichText(
                 text: TextSpan(
-                  children: [
+                  children: <TextSpan>[
                     const TextSpan(
                       text: "Nová verze: ",
                       style: TextStyle(
@@ -85,7 +85,7 @@ class _SettingsState extends State<Settings> {
           ),
           actions: <Widget>[
             if (object.body!["downloadUrl"] != null)
-              ElevatedButton(
+              OutlinedButton(
                 onPressed: () {
                   launchUrl(
                     Uri.parse(object.body!["downloadUrl"]),
@@ -126,7 +126,7 @@ class _SettingsState extends State<Settings> {
           title: Text("Chyba ${object.statusCode}"),
           content:
               const Text("Chyba při zjišťování verze. Kontaktujte vývojáře."),
-          actions: [
+          actions: <Widget>[
             TextButton(
               onPressed: () {
                 Navigator.pop(context);
@@ -172,7 +172,7 @@ class _SettingsState extends State<Settings> {
                         child: const Text("Zrušit"),
                         onPressed: () => Navigator.pop(context),
                       ),
-                      ElevatedButton(
+                      OutlinedButton(
                         child: const Text("Smazat"),
                         onPressed: () {
                           vars.clothes.clear();
@@ -295,7 +295,7 @@ class _SettingsState extends State<Settings> {
                                     child: const Text("Zrušit"),
                                     onPressed: () => Navigator.pop(context),
                                   ),
-                                  ElevatedButton(
+                                  OutlinedButton(
                                     child: const Text("Uložit"),
                                     onPressed: () {
                                       if (vars.newName != null) {
@@ -340,7 +340,7 @@ class _SettingsState extends State<Settings> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: <Widget>[
-                    ElevatedButton.icon(
+                    OutlinedButton.icon(
                       icon: Icon(
                         (Theme.of(context).brightness == Brightness.dark)
                             ? Icons.light_mode
@@ -426,7 +426,7 @@ class _SettingsState extends State<Settings> {
                                     Navigator.pop(context);
                                   },
                                 ),
-                                ElevatedButton(
+                                OutlinedButton(
                                   child: const Text("Potvrdit"),
                                   onPressed: () {
                                     vars.theme = mode;
@@ -443,7 +443,7 @@ class _SettingsState extends State<Settings> {
                                               child: const Text("Později"),
                                               onPressed: () =>
                                                   Navigator.pop(context)),
-                                          ElevatedButton(
+                                          OutlinedButton(
                                             child: const Text("Restartovat"),
                                             onPressed: () {
                                               if (Platform.isAndroid) {
@@ -465,7 +465,7 @@ class _SettingsState extends State<Settings> {
                       },
                       label: const Text("Změnit mód"),
                     ),
-                    ElevatedButton.icon(
+                    OutlinedButton.icon(
                       icon: const Icon(Icons.color_lens),
                       label: const Text("Změnit barvu"),
                       onPressed: () {
@@ -488,7 +488,7 @@ class _SettingsState extends State<Settings> {
                                 child: const Text("Zrušit"),
                                 onPressed: () => Navigator.pop(context),
                               ),
-                              ElevatedButton(
+                              OutlinedButton(
                                 child: const Text("Potvrdit"),
                                 onPressed: () {
                                   vars.hexColor = newColor;
@@ -505,7 +505,7 @@ class _SettingsState extends State<Settings> {
                                             child: const Text("Později"),
                                             onPressed: () =>
                                                 Navigator.pop(context)),
-                                        ElevatedButton(
+                                        OutlinedButton(
                                           child: const Text("Restartovat"),
                                           onPressed: () {
                                             if (Platform.isAndroid) {
@@ -533,7 +533,7 @@ class _SettingsState extends State<Settings> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: <Widget>[
-                    ElevatedButton.icon(
+                    OutlinedButton.icon(
                       icon: const Icon(Icons.download),
                       onPressed: () {
                         showDialog(
@@ -638,7 +638,7 @@ class _SettingsState extends State<Settings> {
                                         Navigator.pop(context);
                                       },
                                     ),
-                                    ElevatedButton(
+                                    OutlinedButton(
                                       onPressed: () {
                                         if (importMode == 0 &&
                                             importData != null) {
@@ -669,7 +669,7 @@ class _SettingsState extends State<Settings> {
                       },
                       label: const Text("Importovat data"),
                     ),
-                    ElevatedButton.icon(
+                    OutlinedButton.icon(
                       icon: const Icon(Icons.upload),
                       onPressed: () {
                         showDialog(
@@ -688,7 +688,7 @@ class _SettingsState extends State<Settings> {
                                 child: SingleChildScrollView(
                                   child: Column(
                                     mainAxisSize: MainAxisSize.min,
-                                    children: [
+                                    children: <Widget>[
                                       const Text(
                                         "Níže jsou vyexportované data. Můžete si je zkopírovat.",
                                         style: TextStyle(fontSize: 20),
@@ -739,7 +739,7 @@ class _SettingsState extends State<Settings> {
                   children: <Widget>[
                     isLoading
                         ? const CircularProgressIndicator()
-                        : ElevatedButton.icon(
+                        : OutlinedButton.icon(
                             icon: const Icon(Icons.update),
                             label: const Text('Zkontrolovat aktualizace'),
                             onPressed: () {
@@ -764,9 +764,9 @@ class _SettingsState extends State<Settings> {
                 const Divider(
                   thickness: 2,
                 ),
-                Center(
+                const Center(
                   child: Column(
-                    children: const <Widget>[
+                    children: <Widget>[
                       SizedBox(
                         height: 10,
                       ),
