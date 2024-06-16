@@ -1,4 +1,4 @@
-import 'dart:convert';
+/* import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:intr_obleceni/vars.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -27,167 +27,12 @@ class _SettingsState extends State<Settings> {
   String? newColor;
   bool isLoading = false;
 
-  handleCheckingVersion() async {
-    setState(() {
-      isLoading = true;
-    });
-    var object = await checkVersion(vars.version);
-    setState(() {
-      isLoading = false;
-    });
-    if (object.statusCode == 200) {
-      showDialog(
-        context: context,
-        builder: (context) => AlertDialog(
-          title: const Text("Dostupná aktualizace!"),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              RichText(
-                text: TextSpan(
-                  style: TextStyle(
-                    color: Theme.of(context).brightness == Brightness.dark
-                        ? Colors.white
-                        : Colors.black,
-                  ),
-                  children: const [
-                    TextSpan(
-                      text: "Aktuální verze: ",
-                      style: TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                    TextSpan(text: vars.version),
-                  ],
-                ),
-              ),
-              RichText(
-                text: TextSpan(
-                  children: <TextSpan>[
-                    const TextSpan(
-                      text: "Nová verze: ",
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: Colors.green,
-                      ),
-                    ),
-                    TextSpan(
-                      text: object.body!["latestVersion"] + "\n",
-                      style: TextStyle(
-                        color: Theme.of(context).brightness == Brightness.dark
-                            ? Colors.white
-                            : Colors.black,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-          actions: <Widget>[
-            if (object.body!["downloadUrl"] != null)
-              OutlinedButton(
-                onPressed: () {
-                  launchUrl(
-                    Uri.parse(object.body!["downloadUrl"]),
-                    mode: LaunchMode.externalApplication,
-                  );
-                },
-                child: const Text("Stáhnout novou verzi"),
-              ),
-            TextButton(
-              child: const Text("OK"),
-              onPressed: () {
-                Navigator.pop(context);
-              },
-            ),
-          ],
-        ),
-      );
-    } else if (object.statusCode == 204) {
-      showDialog(
-        context: context,
-        builder: (context) => AlertDialog(
-          title: const Text("Aplikace je aktuální!"),
-          content: const Text("Žádná nová verze není k dispozici."),
-          actions: <Widget>[
-            TextButton(
-              child: const Text("OK"),
-              onPressed: () {
-                Navigator.pop(context);
-              },
-            ),
-          ],
-        ),
-      );
-    } else {
-      showDialog(
-        context: context,
-        builder: (context) => AlertDialog(
-          title: Text("Chyba ${object.statusCode}"),
-          content:
-              const Text("Chyba při zjišťování verze. Kontaktujte vývojáře."),
-          actions: <Widget>[
-            TextButton(
-              onPressed: () {
-                Navigator.pop(context);
-              },
-              child: const Text("OK"),
-            ),
-          ],
-        ),
-      );
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
-    setstate() {
-      setState(() {});
-    }
-
     return SafeArea(
       child: Scaffold(
         appBar: AppBar(
-          backgroundColor: Theme.of(context).primaryColor,
-          leading: IconButton(
-            tooltip: "Zpět",
-            icon: const Icon(Icons.arrow_back),
-            onPressed: () {
-              Navigator.pop(context);
-            },
-          ),
           title: const Text("Nastavení"),
-          actions: <Widget>[
-            IconButton(
-              tooltip: "Smazat data",
-              icon: const Icon(Icons.delete),
-              onPressed: () {
-                showDialog(
-                  context: context,
-                  builder: (context) => AlertDialog(
-                    title: const Text("Smazat všechna data?"),
-                    content: const Text("Tato akce je nevratná."),
-                    actions: <Widget>[
-                      TextButton(
-                        child: const Text("Zrušit"),
-                        onPressed: () => Navigator.pop(context),
-                      ),
-                      OutlinedButton(
-                        child: const Text("Smazat"),
-                        onPressed: () {
-                          vars.clothes.clear();
-                          saveData();
-                          Navigator.pop(context);
-                          setState(() {});
-                        },
-                      ),
-                    ],
-                  ),
-                );
-              },
-            ),
-          ],
-          elevation: 2,
         ),
         body: Scrollbar(
           controller: ScrollController(),
@@ -198,63 +43,6 @@ class _SettingsState extends State<Settings> {
             axisDirection: AxisDirection.down,
             child: ListView(
               children: <Widget>[
-                Container(
-                  padding: const EdgeInsets.all(8),
-                  child: Row(
-                    children: <Widget>[
-                      Flexible(
-                        child: TextField(
-                          controller: _controller,
-                          decoration: InputDecoration(
-                            hintText: "Zadejte položku",
-                            suffixIcon: IconButton(
-                              tooltip: "Přidat položku",
-                              icon: const Icon(Icons.send),
-                              onPressed: () {
-                                if (vars.addedClothing != null) {
-                                  if (vars.addedClothing!.contains("\"") ||
-                                      vars.addedClothing!.contains("\\")) {
-                                    showDialog(
-                                      context: context,
-                                      builder: (context) => AlertDialog(
-                                        title:
-                                            const Text("Nelze přidat položku!"),
-                                        content: const Text(
-                                            "Položka obsahuje nepovolené znaky."),
-                                        actions: <Widget>[
-                                          TextButton(
-                                            child: const Text("Zavřít"),
-                                            onPressed: () =>
-                                                Navigator.pop(context),
-                                          ),
-                                        ],
-                                      ),
-                                    );
-                                  } else {
-                                    vars.clothes.add(
-                                      vars.Clothing(
-                                        name: vars.addedClothing!.trim(),
-                                        count: 0,
-                                        lastChangedDateTime: DateTime.now(),
-                                      ),
-                                    );
-                                    saveData();
-                                  }
-                                  vars.addedClothing = null;
-                                  _controller.clear();
-                                  setState(() {});
-                                }
-                              },
-                            ),
-                          ),
-                          onChanged: (value) {
-                            vars.addedClothing = value;
-                          },
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
                 for (vars.Clothing clothing in vars.clothes)
                   Container(
                     padding: const EdgeInsets.all(8),
@@ -823,3 +611,4 @@ areDataValid(String data) {
     return null;
   }
 }
+ */
